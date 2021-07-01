@@ -10,7 +10,7 @@ class Converter:
         self.path = path
         self.converted = ""
         self.tables = defaultdict(lambda: []) # tables and their fields
-        self.table_pks = defaultdict(lambda: []) # tables and their primary keys
+        self.table_pks = {} # tables and their primary key
         self.table_fks = defaultdict(lambda: []) # tables and their foreign keys
         self.edges = defaultdict(lambda: [])
         self.convert()
@@ -58,6 +58,8 @@ class Converter:
             i += 1
 
         pprint(self.tables)
+        pprint(self.table_pks)
+        pprint(self.table_fks)
 
         print()
 
@@ -78,7 +80,10 @@ class Converter:
             # print(f"table {table_name} content: {line}")
 
             if split_line[0] == "primary":
-                pass
+                if line[-1] == ",":
+                    self.table_pks[table_name] = split_line[1][5:-3]
+                else:
+                    self.table_pks[table_name] = split_line[1][5:-2]
 
             elif split_line[0] == "foreign":
                 pass
