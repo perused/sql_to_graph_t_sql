@@ -6,12 +6,13 @@ import argparse
 class Converter:
     def __init__(self, path) -> None:
         self.path = path
+        self.converted = ""
         self.tables = {}
         self.edges = {}
         self.convert()
 
     def convert(self):
-        # firstly, convert the file into t-sql
+        # firstly, convert the schema into t-sql format, add AS NODE to the end of each table, add tables to self.tables
         self.convert_file()
         # then, add AS NODE to the end of table definitions
         # also add these to self.tables and track primary/foreign keys on the way
@@ -22,9 +23,24 @@ class Converter:
         self.insert_edges()
         # then write the final output to path_converted.txt
         self.write_output()
-
+    
     def convert_file(self):
-        pass
+        fp = open(self.path, "r")
+        contents = fp.readlines()
+        fp.close()
+        for line in contents:
+            line = line.strip()
+            # replace backticks with "
+            line = line.replace('`', '"')
+            # if line is beginning of table declaration
+            # add table name to self.tables and its fields too
+            # convert datatypes e.g text to VARCHAR(100)
+            split_line = line.split()
+            if split_line[0] == "CREATE":
+                pass
+            # if line is beginning of insert statmement, convert it from INSERT INTO <table> VALUES (val_col_0, val_col_1, …, val_col_n), which looks like this: INSERT INTO  "battle" VALUES (1,"Battle of Adrianople","14 April 1205","Kaloyan","Baldwin I","Bulgarian victory"); into INSERT INTO <table> VALUES (1, <val_0>), (2, <val_1>), …, (n, <val_n>)
+            elif split_line[0] == "INSERT":
+                pass
 
     def initialise_nodes(self):
         pass
