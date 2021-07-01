@@ -11,7 +11,7 @@ class Converter:
         self.convert()
 
     def convert(self):
-        # firstly, convert the file from sqlite into t-sql
+        # firstly, convert the file into t-sql
         self.convert_file()
         # then, add AS NODE to the end of table definitions
         # also add these to self.tables and track primary/foreign keys on the way
