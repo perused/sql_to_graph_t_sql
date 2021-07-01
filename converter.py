@@ -11,7 +11,7 @@ class Converter:
         self.converted = ""
         self.tables = defaultdict(lambda: []) # tables and their fields
         self.table_pks = {} # tables and their primary key
-        self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (referenced table, referenced key)
+        self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
         self.nodes = {} # (table_name, node_name): ID
         self.edges = defaultdict(lambda: [])  # tableA_to_tableB: [(tableAnode, tableBnode)...]
         self.convert()
@@ -155,11 +155,11 @@ class Converter:
 # -- you need to provide the $node_id from $from_id and $to_id columns.
 # /* Insert which restaurants each person likes */
 # INSERT INTO likes
-# 	VALUES ((SELECT $node_id FROM Person WHERE ID = 1), (SELECT $node_id FROM Restaurant WHERE ID = 1), 9)
-# 		 , ((SELECT $node_id FROM Person WHERE ID = 2), (SELECT $node_id FROM Restaurant WHERE ID = 2), 9)
-# 		 , ((SELECT $node_id FROM Person WHERE ID = 3), (SELECT $node_id FROM Restaurant WHERE ID = 3), 9)
-# 		 , ((SELECT $node_id FROM Person WHERE ID = 4), (SELECT $node_id FROM Restaurant WHERE ID = 3), 9)
-# 		 , ((SELECT $node_id FROM Person WHERE ID = 5), (SELECT $node_id FROM Restaurant WHERE ID = 3), 9);
+# 	VALUES ((SELECT $node_id FROM Person WHERE ID = 1), (SELECT $node_id FROM Restaurant WHERE ID = 1))
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 2), (SELECT $node_id FROM Restaurant WHERE ID = 2))
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 3), (SELECT $node_id FROM Restaurant WHERE ID = 3))
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 4), (SELECT $node_id FROM Restaurant WHERE ID = 3))
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 5), (SELECT $node_id FROM Restaurant WHERE ID = 3));
 
     # add primary/foreign key edges to these tables
     def insert_edges(self, edge_table_names):
@@ -167,11 +167,27 @@ class Converter:
             pair = pair.split("_")
             a = pair[0]
             b = pair[2]
+            edge_name = f"{a}_to_{b}"
+            if edge_name not in self.edges:
+                raise Exception(f"Edge name {edge_name} not in self.edges")
+            edges = set() # (node_a, node_b)
+            insertion = f"INSERT INTO {edge_name} VALUES ("
 
-            # check for primary/foreign keys from a to b, add these edges
+            # self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as
+            # table: (for_key, ref_table, ref_key)
+            # self.nodes = {} # (table_name, node_name): ID
 
-            # check for primary/foreign keys from b to a, add these edges if they are new
+            # check for primary/foreign keys from a to b, add these edges to 'edges' and 'insertion'
+            for entry in self.table_fks[a]:
+                if (entry[0], entry[2]) not in edges and (entry[2], entry[0]) not in edges:
+                    pass
 
+            # check for primary/foreign keys from b to a, add these edges if they are new to 'edges' 
+            for entry in self.table_fks[b]:
+                pass
+            
+            insertion += ");\n\n"
+            self.converted += insertion
 
     # write the final output to path_converted.txt
     def write_output(self):
