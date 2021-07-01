@@ -1,4 +1,5 @@
 PRAGMA foreign_keys = ON;
+
 CREATE TABLE "battle" (
 	"id" int,
 	"name" VARCHAR(100),

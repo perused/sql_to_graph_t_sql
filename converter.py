@@ -12,7 +12,10 @@ class Converter:
         self.tables = defaultdict(lambda: []) # tables and their fields
         self.table_pks = {} # tables and their primary key
         self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (referenced table, referenced key)
-        self.edges = defaultdict(lambda: [])
+        # edges
+        # key = (table_a, table_b)
+        # values = list of (table_a_node, table_b_node)
+        self.edges = defaultdict(lambda: []) 
         self.convert()
 
     def convert(self):
@@ -22,7 +25,6 @@ class Converter:
     
     # converts schema into t-sql format (including replacing data types in tables and changing format of insert statements), adds tables + primary keys + foreign keys to instance dictionaries and adds AS NODE to end of tables
     def convert_file(self):
-        print()
         fp = open(self.path, "r")
         contents = fp.readlines()
         fp.close()
@@ -47,10 +49,8 @@ class Converter:
 
             # other
             else:
-                self.converted += line + "\n"
+                self.converted += line + "\n\n"
             i += 1
-
-        print(self.converted)
 
         return
 
@@ -125,10 +125,34 @@ class Converter:
         new_line += new_vals + ");\n\n"
         self.converted += new_line
 
-    # add edge tables for all possible relations between tables 
+# -- Create EDGE tables.
+# CREATE TABLE likes (rating INTEGER) AS EDGE;
+# CREATE TABLE friendOf AS EDGE;
+# CREATE TABLE livesIn AS EDGE;
+# CREATE TABLE locatedIn AS EDGE;
+
+# -- Insert into edge table. While inserting into an edge table,
+# -- you need to provide the $node_id from $from_id and $to_id columns.
+# /* Insert which restaurants each person likes */
+# INSERT INTO likes
+# 	VALUES ((SELECT $node_id FROM Person WHERE ID = 1), (SELECT $node_id FROM Restaurant WHERE ID = 1), 9)
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 2), (SELECT $node_id FROM Restaurant WHERE ID = 2), 9)
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 3), (SELECT $node_id FROM Restaurant WHERE ID = 3), 9)
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 4), (SELECT $node_id FROM Restaurant WHERE ID = 3), 9)
+# 		 , ((SELECT $node_id FROM Person WHERE ID = 5), (SELECT $node_id FROM Restaurant WHERE ID = 3), 9);
+
+    # add edge tables for all possible relations between two tables - edges are not directed so A -> B == B -> A
     # add primary/foreign key edges to these tables
     def add_edges(self):
-        pass
+        tables = self.tables.keys()
+        edges = set()
+        for a in tables:
+            for b in tables:
+                if a == b:
+                    continue
+                if (a, b) not in edges and (b, a) not in edges:
+                    edges.add((a, b))
+        print(edges)
 
     # write the final output to path_converted.txt
     def write_output(self):
@@ -136,6 +160,7 @@ class Converter:
         new_path += "_converted.sql"
         with open(new_path, "w") as fp:
             fp.write(self.converted)
+        print(f"Converted output written to '{new_path}'.")
 
 # process command line arguments
 # returns: args - namespace of command line arguments
