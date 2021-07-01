@@ -50,16 +50,19 @@ class Converter:
 
             # insert
             elif split_line[0] == "INSERT":
-                pass
+                self.convert_insert(line)
 
             # other
             else:
                 self.converted += line + "\n"
             i += 1
 
-        pprint(self.tables)
-        pprint(self.table_pks)
-        pprint(self.table_fks)
+        # pprint(self.tables)
+        # pprint(self.table_pks)
+        # pprint(self.table_fks)
+
+        # print("converted:")
+        # print(self.converted)
 
         print()
 
@@ -69,13 +72,14 @@ class Converter:
     # add AS NODE to end of table
     # add to self.converted
     def convert_table(self, contents, i, table_name):
-        # self.tables[table_name] = []
+        self.converted += contents[i]
         i += 1
         line = contents[i].strip()
         while line != ");":
             # TODO: check if any inserts in spider are larger than 100 characters
             line = line.replace("text", "VARCHAR(100)")
             line = line.replace('`', '"')
+            self.converted += line + "\n"
             split_line = line.split()
             # print(f"table {table_name} content: {line}")
 
@@ -101,6 +105,8 @@ class Converter:
             i += 1
             line = contents[i].strip()
 
+        self.converted += line + "\n"
+
         return i
 
     # given the desired index of occurrence of a character, return the index of that character at that occurrence. Assumes occ > 0. None if not found
@@ -116,8 +122,20 @@ class Converter:
         return None
 
     # convert sqlite insert statement to valid T-SQL insert statement
-    def convert_insert(self):
-        pass
+    # Insertions into table need to be changed from INSERT INTO <table> VALUES (val_col_0, val_col_1, …, val_col_n), which looks like this: INSERT INTO  "battle" VALUES (1,"Battle of Adrianople","14 April 1205","Kaloyan","Baldwin I","Bulgarian victory"); into INSERT INTO <table> VALUES (1, <val_0>), (2, <val_1>), …, (n, <val_n>)
+    def convert_insert(self, line):
+        first_bracket = self.get_occurrence(line, "(", 1) + 1
+        new_line = line[0:first_bracket]
+        vals = line[first_bracket:-2]
+        new_vals = "\n"
+        vals = vals.split(",")
+        for i, val in enumerate(vals, 1):
+            if i == len(vals):
+                new_vals += f"({i}, {val})\n"
+            else:
+                new_vals += f"({i}, {val}),\n"
+        new_line += new_vals + ");\n"
+        self.converted += new_line
 
     def initialise_nodes(self):
         pass
