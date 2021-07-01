@@ -28,6 +28,7 @@ class Converter:
         # then write the final output to path_converted.txt
         self.write_output()
     
+    # converts schema into t-sql format (including replacing data types in tables and changing format of insert statements), adds tables + primary keys + foreign keys to instance dictionaries and adds AS NODE to end of tables
     def convert_file(self):
         print()
         fp = open(self.path, "r")
@@ -57,14 +58,9 @@ class Converter:
                 self.converted += line + "\n"
             i += 1
 
-        # pprint(self.tables)
-        # pprint(self.table_pks)
-        # pprint(self.table_fks)
+        print(self.converted)
 
-        # print("converted:")
-        # print(self.converted)
-
-        print()
+        return
 
     # add table name to self.tables and its fields too
     # convert datatypes e.g text to VARCHAR(100)
@@ -105,7 +101,7 @@ class Converter:
             i += 1
             line = contents[i].strip()
 
-        self.converted += line + "\n"
+        self.converted += ") AS NODE;" + "\n"
 
         return i
 
