@@ -33,7 +33,7 @@ CREATE TABLE "death" (
 ) AS NODE;
 
 INSERT INTO  "battle" VALUES (
-	(1, 1),
+	(1, "1"),
 	(2, "Battle of Adrianople"),
 	(3, "14 April 1205"),
 	(4, "Kaloyan"),
@@ -42,7 +42,7 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "battle" VALUES (
-	(1, 2),
+	(1, "2"),
 	(2, "Battle of Serres"),
 	(3, "June 1205"),
 	(4, "Kaloyan"),
@@ -51,7 +51,7 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "battle" VALUES (
-	(1, 3),
+	(1, "3"),
 	(2, "Battle of Rusion"),
 	(3, "31 January 1206"),
 	(4, "Kaloyan"),
@@ -60,7 +60,7 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "battle" VALUES (
-	(1, 4),
+	(1, "4"),
 	(2, "Battle of Rodosto"),
 	(3, "February 1206"),
 	(4, "Kaloyan"),
@@ -69,7 +69,7 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "battle" VALUES (
-	(1, 5),
+	(1, "5"),
 	(2, "Battle of Messinopolis"),
 	(3, "4 September 1207"),
 	(4, "Unknown"),
@@ -78,7 +78,7 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "battle" VALUES (
-	(1, 6),
+	(1, "6"),
 	(2, "Battle of Boruy"),
 	(3, "June 1205"),
 	(4, "Boril"),
@@ -87,7 +87,7 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "battle" VALUES (
-	(1, 7),
+	(1, "7"),
 	(2, "Battle of Philippopolis"),
 	(3, "31 June 1208"),
 	(4, "Boril"),
@@ -96,7 +96,7 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "battle" VALUES (
-	(1, 8),
+	(1, "8"),
 	(2, "Siege of Constantinople"),
 	(3, "1235"),
 	(4, "Ivan Asen II"),
@@ -105,9 +105,9 @@ INSERT INTO  "battle" VALUES (
 );
 
 INSERT INTO  "ship" VALUES (
-	(1, 8),
-	(2,  1),
-	(3,  "Lettice"),
+	(1, "8"),
+	(2, " 1"),
+	(3, " Lettice"),
 	(4, "t"),
 	(5, "Brig"),
 	(6, "English Channel"),
@@ -115,9 +115,9 @@ INSERT INTO  "ship" VALUES (
 );
 
 INSERT INTO  "ship" VALUES (
-	(1, 7),
-	(2,  2),
-	(3,  "Bon Accord"),
+	(1, "7"),
+	(2, " 2"),
+	(3, " Bon Accord"),
 	(4, "t"),
 	(5, "Brig"),
 	(6, "English Channel"),
@@ -125,9 +125,9 @@ INSERT INTO  "ship" VALUES (
 );
 
 INSERT INTO  "ship" VALUES (
-	(1, 6),
-	(2,  3),
-	(3,  "Mary"),
+	(1, "6"),
+	(2, " 3"),
+	(3, " Mary"),
 	(4, "t"),
 	(5, "Brig"),
 	(6, "English Channel"),
@@ -135,9 +135,9 @@ INSERT INTO  "ship" VALUES (
 );
 
 INSERT INTO  "ship" VALUES (
-	(1, 5),
-	(2,  4),
-	(3,  "HMS Avon"),
+	(1, "5"),
+	(2, " 4"),
+	(3, " HMS Avon"),
 	(4, "391"),
 	(5, "18-gun Brig"),
 	(6, "English Channel"),
@@ -145,9 +145,9 @@ INSERT INTO  "ship" VALUES (
 );
 
 INSERT INTO  "ship" VALUES (
-	(1, 5),
-	(2,  5),
-	(3,  "Three Brothers"),
+	(1, "5"),
+	(2, " 5"),
+	(3, " Three Brothers"),
 	(4, "t"),
 	(5, "Brig"),
 	(6, "SW Approaches"),
@@ -155,9 +155,9 @@ INSERT INTO  "ship" VALUES (
 );
 
 INSERT INTO  "ship" VALUES (
-	(1, 4),
-	(2,  6),
-	(3,  "Bacchus"),
+	(1, "4"),
+	(2, " 6"),
+	(3, " Bacchus"),
 	(4, "t"),
 	(5, "Brig"),
 	(6, "English Channel"),
@@ -165,9 +165,9 @@ INSERT INTO  "ship" VALUES (
 );
 
 INSERT INTO  "ship" VALUES (
-	(1, 8),
-	(2,  7),
-	(3,  "HMS Atalanta"),
+	(1, "8"),
+	(2, " 7"),
+	(3, " HMS Atalanta"),
 	(4, "225"),
 	(5, "8 gun Brig"),
 	(6, "Mid-Atlantic"),
@@ -175,118 +175,118 @@ INSERT INTO  "ship" VALUES (
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 1),
-	(2,  "1"),
-	(3, "Dantewada),
-	(4,  Chhattisgarh"),
+	(1, "1"),
+	(2, " 1"),
+	(3, "Dantewada"),
+	(4, " Chhattisgarh"),
 	(5, "8"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 2),
-	(2,  "2"),
-	(3, "Dantewada),
-	(4,  Chhattisgarh"),
+	(1, "2"),
+	(2, " 2"),
+	(3, "Dantewada"),
+	(4, " Chhattisgarh"),
 	(5, "3"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 3),
-	(2,  "13"),
-	(3, "Erraboru),
-	(4,  Chhattisgarh"),
+	(1, "3"),
+	(2, " 13"),
+	(3, "Erraboru"),
+	(4, " Chhattisgarh"),
 	(5, "25"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 3),
-	(2,  "3"),
-	(3, "East Champaran),
-	(4,  Bihar"),
+	(1, "3"),
+	(2, " 3"),
+	(3, "East Champaran"),
+	(4, " Bihar"),
 	(5, "2"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 4),
-	(2,  "4"),
-	(3, "Gajapati),
-	(4,  Odisha"),
+	(1, "4"),
+	(2, " 4"),
+	(3, "Gajapati"),
+	(4, " Odisha"),
 	(5, "3"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 4),
-	(2,  "5"),
-	(3, "Sundargarh),
-	(4,  Odisha"),
+	(1, "4"),
+	(2, " 5"),
+	(3, "Sundargarh"),
+	(4, " Odisha"),
 	(5, "0"),
 	(6, "9")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 5),
-	(2,  "6"),
-	(3, "Dantewada),
-	(4,  Chhattisgarh"),
+	(1, "5"),
+	(2, " 6"),
+	(3, "Dantewada"),
+	(4, " Chhattisgarh"),
 	(5, "0"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 5),
-	(2,  "7"),
-	(3, "Dantewada),
-	(4,  Chhattisgarh"),
+	(1, "5"),
+	(2, " 7"),
+	(3, "Dantewada"),
+	(4, " Chhattisgarh"),
 	(5, "4"),
 	(6, "5")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 6),
-	(2,  "8"),
-	(3, "Kanker),
-	(4,  Chhattisgarh"),
+	(1, "6"),
+	(2, " 8"),
+	(3, "Kanker"),
+	(4, " Chhattisgarh"),
 	(5, "0"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 1),
-	(2,  "9"),
-	(3, "Dantewada),
-	(4,  Chhattisgarh"),
+	(1, "1"),
+	(2, " 9"),
+	(3, "Dantewada"),
+	(4, " Chhattisgarh"),
 	(5, "29"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 3),
-	(2,  "10"),
-	(3, "WestMidnapore),
-	(4,  West Bengal"),
+	(1, "3"),
+	(2, " 10"),
+	(3, "WestMidnapore"),
+	(4, " West Bengal"),
 	(5, "0"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 2),
-	(2,  "11"),
-	(3, "Bastar),
-	(4,  Chattisgarh"),
+	(1, "2"),
+	(2, " 11"),
+	(3, "Bastar"),
+	(4, " Chattisgarh"),
 	(5, "0"),
 	(6, "0")
 );
 
 INSERT INTO  "death" VALUES (
-	(1, 5),
-	(2,  "12"),
-	(3, "Bokaro),
-	(4,  Jharkhand"),
+	(1, "5"),
+	(2, " 12"),
+	(3, "Bokaro"),
+	(4, " Jharkhand"),
 	(5, "14"),
 	(6, "0")
 );

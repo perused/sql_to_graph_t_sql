@@ -124,6 +124,8 @@ class Converter:
         vals = vals.split(",")
         # TODO: apostrophes surround the insertion value are inconsistent
         for i, val in enumerate(vals, 1):
+            val = val.replace('"', '')
+            val = f'"{val}"'
             if i == len(vals):
                 new_vals += f"\t({i}, {val})\n"
             else:
