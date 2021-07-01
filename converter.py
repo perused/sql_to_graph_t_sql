@@ -112,9 +112,15 @@ class Converter:
     # Insertions into table need to be changed from INSERT INTO <table> VALUES (val_col_0, val_col_1, …, val_col_n), which looks like this: INSERT INTO  "battle" VALUES (1,"Battle of Adrianople","14 April 1205","Kaloyan","Baldwin I","Bulgarian victory"); into INSERT INTO <table> VALUES (1, <val_0>), (2, <val_1>), …, (n, <val_n>)
     def convert_insert(self, line):
         first_bracket = self.get_occurrence(line, "(", 1) + 1
+
+        # TODO: fix inserts INSERT INTO Person (Id, name) VALUES (...). Need to remove 'i' from value but keep it for node id still
+
+        # wrong
         new_line = line[0:first_bracket]
+        # fixed
+        new_line = f"INSERT INTO {table_name} {columns} VALUES (\n"
+
         vals = line[first_bracket:-2]
-        new_vals = "\n"
         vals = vals.split(",")
         # TODO: apostrophes surround the insertion value are inconsistent
         for i, val in enumerate(vals, 1):
