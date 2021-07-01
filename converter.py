@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+from pprint import pprint
 
 # converts an SQLite file to T-SQL
 class Converter:
@@ -55,11 +56,10 @@ class Converter:
                 self.converted += line + "\n"
             i += 1
 
-        print(f"Tables = {self.tables}")
+        pprint(self.tables)
 
         print()
 
-    # if line is beginning of table declaration
     # add table name to self.tables and its fields too
     # convert datatypes e.g text to VARCHAR(100)
     # add primary and foreign keys too
@@ -68,19 +68,29 @@ class Converter:
     def convert_table(self, contents, i, table_name):
         self.tables[table_name] = []
         i += 1
-        while True:
-            line = contents[i].strip()
+        line = contents[i].strip()
+        while line != ");":
             # TODO: check if any inserts in spider are larger than 100 characters
             line = line.replace("text", "VARCHAR(100)")
             line = line.replace('`', '"')
             split_line = line.split()
-            if line == ");":
-                break
-            print(f"table {table_name} content: {line}")
+            # print(f"table {table_name} content: {line}")
+
+            if split_line[0] == "primary":
+                pass
+
+            elif split_line[0] == "foreign":
+                pass
+
+            else:
+                self.tables[table_name].append(split_line[0])
+
             i += 1
+            line = contents[i].strip()
 
         return i
 
+    # convert sqlite insert statement to valid T-SQL insert statement
     def convert_insert(self):
         pass
 
