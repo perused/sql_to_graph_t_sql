@@ -153,7 +153,15 @@ class Converter:
 
     # add primary/foreign key edges to these tables
     def insert_edges(self, edge_table_names):
-        pass
+        for pair in edge_table_names:
+            pair = pair.split("_")
+            a = pair[0]
+            b = pair[2]
+
+            # check for primary/foreign keys from a to b, add these edges
+
+            # check for primary/foreign keys from b to a, add these edges if they are new
+
 
     # write the final output to path_converted.txt
     def write_output(self):
