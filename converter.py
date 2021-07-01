@@ -141,7 +141,7 @@ class Converter:
             for b in tables:
                 if a == b:
                     continue
-                if (a, b) not in edges and (b, a) not in edges:
+                if f"{a}_to_{b}" not in edges and f"{b}_to_{a}" not in edges:
                     # add the edge and its table
                     edge_name = f"{a}_to_{b}"
                     edges.add(edge_name)
