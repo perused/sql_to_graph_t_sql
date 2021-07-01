@@ -11,7 +11,7 @@ class Converter:
         self.converted = ""
         self.tables = defaultdict(lambda: []) # tables and their fields
         self.table_pks = {} # tables and their primary key
-        self.table_fks = defaultdict(lambda: []) # tables and their foreign keys
+        self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (referenced table, referenced key)
         self.edges = defaultdict(lambda: [])
         self.convert()
 
@@ -86,7 +86,14 @@ class Converter:
                     self.table_pks[table_name] = split_line[1][5:-2]
 
             elif split_line[0] == "foreign":
-                pass
+                # string manipulation to extract mentions of foreign key, referenced table and referenced key from this line
+                for_key = split_line[2][2:-2]
+                ref_table = split_line[4][1:self.get_occurrence(split_line[4], '"', 2)]
+                if line[-1] == ",":
+                    ref_key = split_line[4][self.get_occurrence(split_line[4], '"', 3)+1:-3]
+                else:
+                    ref_key = split_line[4][self.get_occurrence(split_line[4], '"', 3)+1:-2]
+                self.table_fks[table_name] = (for_key, ref_table, ref_key)
 
             else:
                 self.tables[table_name].append(split_line[0])
@@ -95,6 +102,18 @@ class Converter:
             line = contents[i].strip()
 
         return i
+
+    # given the desired index of occurrence of a character, return the index of that character at that occurrence. Assumes occ > 0. None if not found
+    def get_occurrence(self, string, char, occ):
+        i = 0
+        count = 0
+        while i < len(string):
+            if string[i] == char:
+                count += 1
+                if count == occ:
+                    return i
+            i += 1
+        return None
 
     # convert sqlite insert statement to valid T-SQL insert statement
     def convert_insert(self):
