@@ -1,5 +1,3 @@
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE "battle" (
 	"id" int,
 	"name" VARCHAR(100),
@@ -300,12 +298,12 @@ INSERT INTO battle_to_death VALUES (
 	((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM ship WHERE ID = 2))
 );
 
+INSERT INTO battle_to_ship VALUES (
+	((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
+);
+
 INSERT INTO ship_to_death VALUES (
 	((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
 	, ((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM ship WHERE ID = 2))
-);
-
-INSERT INTO battle_to_ship VALUES (
-	((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
 );
 

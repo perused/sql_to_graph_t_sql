@@ -45,9 +45,6 @@ class Converter:
             elif split_line[0] == "INSERT":
                 self.convert_insert(line)
 
-            # other
-            else:
-                self.converted += line + "\n\n"
             i += 1
 
         return
