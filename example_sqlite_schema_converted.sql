@@ -299,3 +299,25 @@ CREATE TABLE ship_to_death AS EDGE;
 CREATE TABLE death_to_battle AS EDGE;
 CREATE TABLE death_to_ship AS EDGE;
 
+INSERT INTO battle_to_ship VALUES (
+);
+
+INSERT INTO ship_to_death VALUES (
+	((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM death WHERE ID = 2))
+);
+
+INSERT INTO battle_to_death VALUES (
+);
+
+INSERT INTO death_to_battle VALUES (
+	((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
+);
+
+INSERT INTO ship_to_battle VALUES (
+	((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
+);
+
+INSERT INTO death_to_ship VALUES (
+	((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM ship WHERE ID = 2))
+);
+

@@ -51,8 +51,6 @@ class Converter:
                 self.converted += line + "\n\n"
             i += 1
 
-        print(self.nodes)
-
         return
 
     # add table name to self.tables and its fields too
@@ -87,7 +85,7 @@ class Converter:
                     ref_key = split_line[4][self.get_occurrence(split_line[4], '"', 3)+1:-3]
                 else:
                     ref_key = split_line[4][self.get_occurrence(split_line[4], '"', 3)+1:-2]
-                self.table_fks[table_name] = (for_key, ref_table, ref_key)
+                self.table_fks[table_name].append((for_key, ref_table, ref_key))
 
             else:
                 node = split_line[0].replace('"', '')
@@ -163,28 +161,36 @@ class Converter:
 
     # add primary/foreign key edges to these tables
     def insert_edges(self, edge_table_names):
-        for pair in edge_table_names:
-            pair = pair.split("_")
-            a = pair[0]
-            b = pair[2]
-            edge_name = f"{a}_to_{b}"
-            if edge_name not in self.edges:
-                raise Exception(f"Edge name {edge_name} not in self.edges")
+        print()
+        for edge_name in edge_table_names:
+            original = edge_name
+            edge_name = edge_name.split("_")
+            edge_from_table = edge_name[0]
+            edge_to_table = edge_name[2]
             edges = set() # (node_a, node_b)
-            insertion = f"INSERT INTO {edge_name} VALUES ("
+            insertion = f"INSERT INTO {original} VALUES (\n"
 
             # self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as
             # table: (for_key, ref_table, ref_key)
             # self.nodes = {} # (table_name, node_name): ID
 
             # check for primary/foreign keys from a to b, add these edges to 'edges' and 'insertion'
-            for entry in self.table_fks[a]:
-                if (entry[0], entry[2]) not in edges and (entry[2], entry[0]) not in edges:
-                    pass
+            for entry in self.table_fks[edge_from_table]:
+                edge_from = entry[0]
+                edge_to = entry[2]
+                if (edge_from, edge_to) not in edges and (edge_to, edge_from) not in edges:
+
+                    edge_from_id = self.nodes[(edge_from_table, edge_from)]
+                    edge_to_id = self.nodes[(edge_to_table, edge_to)]
+
+                    if entry == self.table_fks[edge_from_table][-1]:
+                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+                    else:
+                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id})),\n"
 
             # check for primary/foreign keys from b to a, add these edges if they are new to 'edges' 
-            for entry in self.table_fks[b]:
-                pass
+            # for entry in self.table_fks[b]:
+            #     pass
             
             insertion += ");\n\n"
             self.converted += insertion
