@@ -12,6 +12,7 @@ class Converter:
         self.tables = defaultdict(lambda: []) # tables and their fields
         self.table_pks = {} # tables and their primary key
         self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (referenced table, referenced key)
+        self.nodes = {} # (table_name, node_name): ID
         self.edges = defaultdict(lambda: [])  # tableA_to_tableB: [(tableAnode, tableBnode)...]
         self.convert()
 
@@ -50,6 +51,8 @@ class Converter:
                 self.converted += line + "\n\n"
             i += 1
 
+        print(self.nodes)
+
         return
 
     # add table name to self.tables and its fields too
@@ -61,6 +64,7 @@ class Converter:
         self.converted += contents[i]
         i += 1
         line = contents[i].strip()
+        id = 1
         while line != ");":
             # TODO: check if any inserts in spider are larger than 100 characters
             line = line.replace("text", "VARCHAR(100)")
@@ -86,7 +90,10 @@ class Converter:
                 self.table_fks[table_name] = (for_key, ref_table, ref_key)
 
             else:
-                self.tables[table_name].append(split_line[0])
+                node = split_line[0].replace('"', '')
+                self.tables[table_name].append(node)
+                self.nodes[(table_name, node)] = id
+                id += 1
 
             i += 1
             line = contents[i].strip()
@@ -115,6 +122,7 @@ class Converter:
         vals = line[first_bracket:-2]
         new_vals = "\n"
         vals = vals.split(",")
+        # TODO: apostrophes surround the insertion value are inconsistent
         for i, val in enumerate(vals, 1):
             if i == len(vals):
                 new_vals += f"\t({i}, {val})\n"

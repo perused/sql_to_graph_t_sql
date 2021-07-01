@@ -294,5 +294,8 @@ INSERT INTO  "death" VALUES (
 
 CREATE TABLE battle_to_ship AS EDGE;
 CREATE TABLE battle_to_death AS EDGE;
+CREATE TABLE ship_to_battle AS EDGE;
 CREATE TABLE ship_to_death AS EDGE;
+CREATE TABLE death_to_battle AS EDGE;
+CREATE TABLE death_to_ship AS EDGE;
 
