@@ -291,3 +291,8 @@ INSERT INTO  "death" VALUES (
 	(6, "0")
 );
 
+
+CREATE TABLE battle_to_ship AS EDGE;
+CREATE TABLE battle_to_death AS EDGE;
+CREATE TABLE ship_to_death AS EDGE;
+
