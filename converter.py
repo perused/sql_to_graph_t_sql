@@ -2,16 +2,17 @@ import os
 import sys
 import argparse
 from pprint import pprint
+from collections import defaultdict
 
 # converts an SQLite file to T-SQL
 class Converter:
     def __init__(self, path) -> None:
         self.path = path
         self.converted = ""
-        self.tables = {} # tables and their fields
-        self.table_pks = {} # tables and their primary keys
-        self.table_fks = {} # tables and their foreign keys
-        self.edges = {}
+        self.tables = defaultdict(lambda: []) # tables and their fields
+        self.table_pks = defaultdict(lambda: []) # tables and their primary keys
+        self.table_fks = defaultdict(lambda: []) # tables and their foreign keys
+        self.edges = defaultdict(lambda: [])
         self.convert()
 
     def convert(self):
@@ -66,7 +67,7 @@ class Converter:
     # add AS NODE to end of table
     # add to self.converted
     def convert_table(self, contents, i, table_name):
-        self.tables[table_name] = []
+        # self.tables[table_name] = []
         i += 1
         line = contents[i].strip()
         while line != ");":
