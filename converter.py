@@ -25,22 +25,51 @@ class Converter:
         self.write_output()
     
     def convert_file(self):
+        print()
         fp = open(self.path, "r")
         contents = fp.readlines()
         fp.close()
-        for line in contents:
+        i = 0
+        while i < len(contents):
+            line = contents[i]
             line = line.strip()
+            split_line = line.split()
+            if len(split_line) == 0:
+                i += 1
+                continue
             # replace backticks with "
             line = line.replace('`', '"')
             # if line is beginning of table declaration
             # add table name to self.tables and its fields too
             # convert datatypes e.g text to VARCHAR(100)
-            split_line = line.split()
             if split_line[0] == "CREATE":
-                pass
+                # TODO: check if there are any two word table names in the DB
+                table_name = split_line[2]
+                table_name = table_name.replace('"', '')
+                self.tables[table_name] = []
+                # now go through the fields of the table 
+                # convert their datatypes
+                # note the primary keys and foreign keys
+                # add AS NODE to the end
+                i += 1
+                while True:
+                    line = contents[i].strip()
+                    # print(f"line = {line}")
+                    if line == ");":
+                        break
+                    print(f"table {table_name} content: {line}")
+                    i += 1
             # if line is beginning of insert statmement, convert it from INSERT INTO <table> VALUES (val_col_0, val_col_1, …, val_col_n), which looks like this: INSERT INTO  "battle" VALUES (1,"Battle of Adrianople","14 April 1205","Kaloyan","Baldwin I","Bulgarian victory"); into INSERT INTO <table> VALUES (1, <val_0>), (2, <val_1>), …, (n, <val_n>)
             elif split_line[0] == "INSERT":
                 pass
+            # this will probably be pragma foreign keys on and all other lines
+            else:
+                pass
+            i += 1
+
+        print(f"Tables = {self.tables}")
+
+        print()
 
     def initialise_nodes(self):
         pass
