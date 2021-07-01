@@ -16,16 +16,8 @@ class Converter:
         self.convert()
 
     def convert(self):
-        # firstly, convert the schema into t-sql format, add AS NODE to the end of each table, add tables to self.tables
         self.convert_file()
-        # then, add AS NODE to the end of table definitions
-        # also add these to self.tables and track primary/foreign keys on the way
-        self.initialise_nodes()
-        # then, add edges tables for all possible relations between tables
-        self.add_edge_tables()
-        #then, for each of the primary and foreign keys, add an insert edge between them
-        self.insert_edges()
-        # then write the final output to path_converted.txt
+        self.add_edges()
         self.write_output()
     
     # converts schema into t-sql format (including replacing data types in tables and changing format of insert statements), adds tables + primary keys + foreign keys to instance dictionaries and adds AS NODE to end of tables
@@ -75,7 +67,7 @@ class Converter:
             # TODO: check if any inserts in spider are larger than 100 characters
             line = line.replace("text", "VARCHAR(100)")
             line = line.replace('`', '"')
-            self.converted += line + "\n"
+            self.converted += "\t" + line + "\n"
             split_line = line.split()
             # print(f"table {table_name} content: {line}")
 
@@ -101,7 +93,7 @@ class Converter:
             i += 1
             line = contents[i].strip()
 
-        self.converted += ") AS NODE;" + "\n"
+        self.converted += ") AS NODE;" + "\n\n"
 
         return i
 
@@ -127,23 +119,23 @@ class Converter:
         vals = vals.split(",")
         for i, val in enumerate(vals, 1):
             if i == len(vals):
-                new_vals += f"({i}, {val})\n"
+                new_vals += f"\t({i}, {val})\n"
             else:
-                new_vals += f"({i}, {val}),\n"
-        new_line += new_vals + ");\n"
+                new_vals += f"\t({i}, {val}),\n"
+        new_line += new_vals + ");\n\n"
         self.converted += new_line
 
-    def initialise_nodes(self):
+    # add edge tables for all possible relations between tables 
+    # add primary/foreign key edges to these tables
+    def add_edges(self):
         pass
 
-    def add_edge_tables(self):
-        pass
-
-    def insert_edges(self):
-        pass
-
+    # write the final output to path_converted.txt
     def write_output(self):
-        pass
+        new_path = self.path.replace(".sql", "")
+        new_path += "_converted.sql"
+        with open(new_path, "w") as fp:
+            fp.write(self.converted)
 
 # process command line arguments
 # returns: args - namespace of command line arguments
@@ -176,34 +168,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# def get_output_file_name(schema_file_name):
-#     completed = False
-#     i = 0
-#     while not completed:
-#         possible = f"{schema_file_name}_converted_{i}.txt"
-#         if not os.path.isfile(possible):
-#             return possible
-#         i += 1
-
-# # left unfinished with comments, going to just make a basic table by hand to see if the graph stuff is possible first
-# def fix_schema(schema_file_name):
-
-#     # <table_name>: [col0name, col1name, ..., colNname]
-#     tables = {}
-#     output_file_name = get_output_file_name(schema_file_name)
-
-#     fp = open("schema.sql", "r")
-#     contents = fp.readlines()
-#     fp.close()
-
-#     fp = open(output_file_name, "x")
-#     for line in contents:
-#         line = line.strip()
-#         # replace backticks with double quotes
-#         line = line.replace("`", '"')
-#         # if its a table, add it to our table and column dict
-
-#         # otherwise if its an insert, change it from from INSERT INTO <table> VALUES (val_col_0, val_col_1, …, val_col_n) into INSERT INTO <table> VALUES (<col_0_name>, <val_0>), (<col_1_name>, <val_1>), …, (<col_n_name>, <val_n>) by using the tables dict
- 
-#     fp.close()
