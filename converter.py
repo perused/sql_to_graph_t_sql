@@ -171,10 +171,10 @@ class Converter:
                     edge_to_table = entry[1]
                     edge_to_id = self.nodes[(edge_to_table, edge_to)]
 
-                    if entry == self.table_fks[a][-1]:
-                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+                    if count > 0:
+                        insertion += f"\t, ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
                     else:
-                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id})),\n"
+                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
 
                     count += 1
 
@@ -189,11 +189,10 @@ class Converter:
                     edge_from_id = self.nodes[(edge_from_table, edge_from)]
                     edge_to_table = entry[1]
                     edge_to_id = self.nodes[(edge_to_table, edge_to)]
-
-                    if entry == self.table_fks[b][-1]:
-                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+                    if count > 0:
+                        insertion += f"\t, ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
                     else:
-                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id})),\n"
+                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
 
                     count += 1
             
