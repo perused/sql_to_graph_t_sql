@@ -30,273 +30,66 @@ CREATE TABLE "death" (
 	foreign key ("caused_by_ship_id") references "ship"("id")
 ) AS NODE;
 
-INSERT INTO  "battle" VALUES (
-	(1, "1"),
-	(2, "Battle of Adrianople"),
-	(3, "14 April 1205"),
-	(4, "Kaloyan"),
-	(5, "Baldwin I"),
-	(6, "Bulgarian victory")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (1,"Battle of Adrianople","14 April 1205","Kaloyan","Baldwin I","Bulgarian victory");
 
-INSERT INTO  "battle" VALUES (
-	(1, "2"),
-	(2, "Battle of Serres"),
-	(3, "June 1205"),
-	(4, "Kaloyan"),
-	(5, "Unknown"),
-	(6, "Bulgarian victory")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (2,"Battle of Serres","June 1205","Kaloyan","Unknown","Bulgarian victory");
 
-INSERT INTO  "battle" VALUES (
-	(1, "3"),
-	(2, "Battle of Rusion"),
-	(3, "31 January 1206"),
-	(4, "Kaloyan"),
-	(5, "Thierry de Termond"),
-	(6, "Bulgarian victory")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (3,"Battle of Rusion","31 January 1206","Kaloyan","Thierry de Termond","Bulgarian victory");
 
-INSERT INTO  "battle" VALUES (
-	(1, "4"),
-	(2, "Battle of Rodosto"),
-	(3, "February 1206"),
-	(4, "Kaloyan"),
-	(5, "Unknown"),
-	(6, "Bulgarian victory")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (4,"Battle of Rodosto","February 1206","Kaloyan","Unknown","Bulgarian victory");
 
-INSERT INTO  "battle" VALUES (
-	(1, "5"),
-	(2, "Battle of Messinopolis"),
-	(3, "4 September 1207"),
-	(4, "Unknown"),
-	(5, "Boniface of Montferrat"),
-	(6, "Bulgarian victory")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (5,"Battle of Messinopolis","4 September 1207","Unknown","Boniface of Montferrat","Bulgarian victory");
 
-INSERT INTO  "battle" VALUES (
-	(1, "6"),
-	(2, "Battle of Boruy"),
-	(3, "June 1205"),
-	(4, "Boril"),
-	(5, "Henry I"),
-	(6, "Bulgarian victory")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (6,"Battle of Boruy","June 1205","Boril","Henry I","Bulgarian victory");
 
-INSERT INTO  "battle" VALUES (
-	(1, "7"),
-	(2, "Battle of Philippopolis"),
-	(3, "31 June 1208"),
-	(4, "Boril"),
-	(5, "Henry I"),
-	(6, "Latin victory")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (7,"Battle of Philippopolis","31 June 1208","Boril","Henry I","Latin victory");
 
-INSERT INTO  "battle" VALUES (
-	(1, "8"),
-	(2, "Siege of Constantinople"),
-	(3, "1235"),
-	(4, "Ivan Asen II"),
-	(5, "John of Brienne"),
-	(6, "Two Year Truce")
-);
+INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (8,"Siege of Constantinople","1235","Ivan Asen II","John of Brienne","Two Year Truce");
 
-INSERT INTO  "ship" VALUES (
-	(1, "8"),
-	(2, " 1"),
-	(3, " Lettice"),
-	(4, "t"),
-	(5, "Brig"),
-	(6, "English Channel"),
-	(7, "Captured")
-);
+INSERT INTO ship (lost_in_battle, id, name, tonnage, ship_type, location, disposition_of_ship) VALUES (8, 1, "Lettice","t","Brig","English Channel","Captured");
 
-INSERT INTO  "ship" VALUES (
-	(1, "7"),
-	(2, " 2"),
-	(3, " Bon Accord"),
-	(4, "t"),
-	(5, "Brig"),
-	(6, "English Channel"),
-	(7, "Captured")
-);
+INSERT INTO ship (lost_in_battle, id, name, tonnage, ship_type, location, disposition_of_ship) VALUES (7, 2, "Bon Accord","t","Brig","English Channel","Captured");
 
-INSERT INTO  "ship" VALUES (
-	(1, "6"),
-	(2, " 3"),
-	(3, " Mary"),
-	(4, "t"),
-	(5, "Brig"),
-	(6, "English Channel"),
-	(7, "Captured")
-);
+INSERT INTO ship (lost_in_battle, id, name, tonnage, ship_type, location, disposition_of_ship) VALUES (6, 3, "Mary","t","Brig","English Channel","Captured");
 
-INSERT INTO  "ship" VALUES (
-	(1, "5"),
-	(2, " 4"),
-	(3, " HMS Avon"),
-	(4, "391"),
-	(5, "18-gun Brig"),
-	(6, "English Channel"),
-	(7, "Wrecked")
-);
+INSERT INTO ship (lost_in_battle, id, name, tonnage, ship_type, location, disposition_of_ship) VALUES (5, 4, "HMS Avon","391","18-gun Brig","English Channel","Wrecked");
 
-INSERT INTO  "ship" VALUES (
-	(1, "5"),
-	(2, " 5"),
-	(3, " Three Brothers"),
-	(4, "t"),
-	(5, "Brig"),
-	(6, "SW Approaches"),
-	(7, "Scuttled")
-);
+INSERT INTO ship (lost_in_battle, id, name, tonnage, ship_type, location, disposition_of_ship) VALUES (5, 5, "Three Brothers","t","Brig","SW Approaches","Scuttled");
 
-INSERT INTO  "ship" VALUES (
-	(1, "4"),
-	(2, " 6"),
-	(3, " Bacchus"),
-	(4, "t"),
-	(5, "Brig"),
-	(6, "English Channel"),
-	(7, "Sank")
-);
+INSERT INTO ship (lost_in_battle, id, name, tonnage, ship_type, location, disposition_of_ship) VALUES (4, 6, "Bacchus","t","Brig","English Channel","Sank");
 
-INSERT INTO  "ship" VALUES (
-	(1, "8"),
-	(2, " 7"),
-	(3, " HMS Atalanta"),
-	(4, "225"),
-	(5, "8 gun Brig"),
-	(6, "Mid-Atlantic"),
-	(7, "Captured")
-);
+INSERT INTO ship (lost_in_battle, id, name, tonnage, ship_type, location, disposition_of_ship) VALUES (8, 7, "HMS Atalanta","225","8 gun Brig","Mid-Atlantic","Captured");
 
-INSERT INTO  "death" VALUES (
-	(1, "1"),
-	(2, " 1"),
-	(3, "Dantewada"),
-	(4, " Chhattisgarh"),
-	(5, "8"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (1, "1","Dantewada, Chhattisgarh","8","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "2"),
-	(2, " 2"),
-	(3, "Dantewada"),
-	(4, " Chhattisgarh"),
-	(5, "3"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (2, "2","Dantewada, Chhattisgarh","3","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "3"),
-	(2, " 13"),
-	(3, "Erraboru"),
-	(4, " Chhattisgarh"),
-	(5, "25"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (3, "13","Erraboru, Chhattisgarh","25","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "3"),
-	(2, " 3"),
-	(3, "East Champaran"),
-	(4, " Bihar"),
-	(5, "2"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (3, "3","East Champaran, Bihar","2","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "4"),
-	(2, " 4"),
-	(3, "Gajapati"),
-	(4, " Odisha"),
-	(5, "3"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (4, "4","Gajapati, Odisha","3","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "4"),
-	(2, " 5"),
-	(3, "Sundargarh"),
-	(4, " Odisha"),
-	(5, "0"),
-	(6, "9")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (4, "5","Sundargarh, Odisha","0","9");
 
-INSERT INTO  "death" VALUES (
-	(1, "5"),
-	(2, " 6"),
-	(3, "Dantewada"),
-	(4, " Chhattisgarh"),
-	(5, "0"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (5, "6","Dantewada, Chhattisgarh","0","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "5"),
-	(2, " 7"),
-	(3, "Dantewada"),
-	(4, " Chhattisgarh"),
-	(5, "4"),
-	(6, "5")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (5, "7","Dantewada, Chhattisgarh","4","5");
 
-INSERT INTO  "death" VALUES (
-	(1, "6"),
-	(2, " 8"),
-	(3, "Kanker"),
-	(4, " Chhattisgarh"),
-	(5, "0"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (6, "8","Kanker, Chhattisgarh","0","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "1"),
-	(2, " 9"),
-	(3, "Dantewada"),
-	(4, " Chhattisgarh"),
-	(5, "29"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (1, "9","Dantewada, Chhattisgarh","29","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "3"),
-	(2, " 10"),
-	(3, "WestMidnapore"),
-	(4, " West Bengal"),
-	(5, "0"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (3, "10","WestMidnapore, West Bengal","0","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "2"),
-	(2, " 11"),
-	(3, "Bastar"),
-	(4, " Chattisgarh"),
-	(5, "0"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (2, "11","Bastar, Chattisgarh","0","0");
 
-INSERT INTO  "death" VALUES (
-	(1, "5"),
-	(2, " 12"),
-	(3, "Bokaro"),
-	(4, " Jharkhand"),
-	(5, "14"),
-	(6, "0")
-);
+INSERT INTO death (caused_by_ship_id, id, note, killed, injured) VALUES (5, "12","Bokaro, Jharkhand","14","0");
 
 
 CREATE TABLE battle_to_ship AS EDGE;
 CREATE TABLE battle_to_death AS EDGE;
 CREATE TABLE ship_to_death AS EDGE;
-
-INSERT INTO battle_to_death VALUES (
-	((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM ship WHERE ID = 2))
-);
 
 INSERT INTO battle_to_ship VALUES (
 	((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
@@ -305,5 +98,9 @@ INSERT INTO battle_to_ship VALUES (
 INSERT INTO ship_to_death VALUES (
 	((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
 	, ((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM ship WHERE ID = 2))
+);
+
+INSERT INTO battle_to_death VALUES (
+	((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM ship WHERE ID = 2))
 );
 
