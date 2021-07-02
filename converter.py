@@ -109,34 +109,13 @@ class Converter:
         return None
 
     # convert sqlite insert statement to valid T-SQL insert statement
-    # Insertions into table need to be changed from INSERT INTO <table> VALUES (val_col_0, val_col_1, …, val_col_n), which looks like this: INSERT INTO  "battle" VALUES (1,"Battle of Adrianople","14 April 1205","Kaloyan","Baldwin I","Bulgarian victory"); into INSERT INTO <table> VALUES (1, <val_0>), (2, <val_1>), …, (n, <val_n>)
     def convert_insert(self, line):
-
         split_line = line.split()
         table_name = split_line[2].replace('"', '')
-        
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
-
         first_bracket = self.get_occurrence(line, "(", 1) + 1
-
         vals = line[first_bracket:-2]
-
         new_line = f"INSERT INTO {table_name} {columns} VALUES ({vals});\n\n"
-
-
-
-
-        # vals = vals.split(",")
-        # # TODO: apostrophes surround the insertion value are inconsistent
-        # for i, val in enumerate(vals, 1):
-        #     val = val.replace('"', '')
-        #     val = f'"{val}"'
-        #     if i == len(vals):
-        #         new_vals += f"\t({i}, {val})\n"
-        #     else:
-        #         new_vals += f"\t({i}, {val}),\n"
-        # new_line += new_vals + ");\n\n"
-
         self.converted += new_line
 
     # add edge tables for all possible relations between two tables - edges are not directed so A -> B == B -> A
