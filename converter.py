@@ -71,13 +71,13 @@ class Converter:
             split_line = line.split()
             # print(f"table {table_name} content: {line}")
 
-            if split_line[0] == "primary":
+            if split_line[0].lower() == "primary":
                 if line[-1] == ",":
                     self.table_pks[table_name] = split_line[1][5:-3]
                 else:
                     self.table_pks[table_name] = split_line[1][5:-2]
 
-            elif split_line[0] == "foreign":
+            elif split_line[0].lower() == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
                 for_key = split_line[2][1:-1]
                 ref_table = split_line[4][:self.get_occurrence(split_line[4], "(", 1)]
