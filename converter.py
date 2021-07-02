@@ -35,14 +35,14 @@ class Converter:
                 continue
 
             # table
-            if split_line[0] == "CREATE":
+            if split_line[0].upper() == "CREATE":
                 # TODO: check if there are any two word table names in the DB
                 table_name = split_line[2]
                 table_name = table_name.replace('"', '')
                 i = self.convert_table(contents, i, table_name)
 
             # insert
-            elif split_line[0] == "INSERT":
+            elif split_line[0].upper() == "INSERT":
                 self.convert_insert(line)
 
             i += 1
@@ -71,6 +71,7 @@ class Converter:
             split_line = line.split()
             # print(f"table {table_name} content: {line}")
 
+            # TODO: account for if there is a double or more primary key
             if split_line[0].lower() == "primary":
                 if line[-1] == ",":
                     self.table_pks[table_name] = split_line[1][5:-3]
@@ -146,9 +147,9 @@ class Converter:
     def insert_edges(self, edge_table_names):
         for edge_name in edge_table_names:
             original = edge_name
-            edge_name = edge_name.split("_")
+            edge_name = edge_name.split("_to_")
             a = edge_name[0]
-            b = edge_name[2]
+            b = edge_name[1]
             edges = set() # (node_a, node_b)
             count = 0
             insertion = f"INSERT INTO {original} VALUES\n"
@@ -193,6 +194,7 @@ class Converter:
             insertion += ";\n\n"
             if count > 0:
                 self.converted += insertion
+        print()
 
     # write the final output to path_converted.txt
     def write_output(self):
