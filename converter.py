@@ -193,7 +193,6 @@ class Converter:
             insertion += ";\n\n"
             if count > 0:
                 self.converted += insertion
-        print()
 
     # write the final output to path_converted.txt
     def write_output(self):
