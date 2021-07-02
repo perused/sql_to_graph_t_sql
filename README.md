@@ -5,9 +5,9 @@ Creates an edge between primary and foreign keys between tables
 
 Usage for a single file:
 
-python converter.py 0 <file-name>
+python converter.py 0 "file-name"
 
 Usage for a directory (not implemented yet):
 
-python converter.py 1 <directory-name>
+python converter.py 1 "directory-name"
 
