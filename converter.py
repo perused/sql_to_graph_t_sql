@@ -145,7 +145,7 @@ class Converter:
             b = edge_name[2]
             edges = set() # (node_a, node_b)
             count = 0
-            insertion = f"INSERT INTO {original} VALUES (\n"
+            insertion = f"INSERT INTO {original} VALUES\n"
 
             # check for primary/foreign keys from a to b, add these edges to 'edges' and 'insertion'
             for entry in self.table_fks[a]:
@@ -160,9 +160,9 @@ class Converter:
                     edge_to_id = self.nodes[(edge_to_table, edge_to)]
 
                     if count > 0:
-                        insertion += f"\t, ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+                        insertion += f"\t,((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
                     else:
-                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+                        insertion += f"\t ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
 
                     count += 1
 
@@ -178,13 +178,13 @@ class Converter:
                     edge_to_table = entry[1]
                     edge_to_id = self.nodes[(edge_to_table, edge_to)]
                     if count > 0:
-                        insertion += f"\t, ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+                        insertion += f"\t,((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
                     else:
-                        insertion += f"\t((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+                        insertion += f"\t ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
 
                     count += 1
             
-            insertion += ");\n\n"
+            insertion += ";\n\n"
             if count > 0:
                 self.converted += insertion
 
