@@ -10,7 +10,7 @@ class Converter:
         self.path = path
         self.converted = ""
         self.tables = defaultdict(lambda: []) # tables and their fields
-        self.table_pks = {} # tables and their primary key
+        self.table_pks = defaultdict(lambda: []) # tables and their primary keys
         self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
         self.nodes = {} # (table_name, node_name): ID
         self.convert()
@@ -73,10 +73,11 @@ class Converter:
 
             # TODO: account for if there is a double or more primary key
             if split_line[0].lower() == "primary":
-                if line[-1] == ",":
-                    self.table_pks[table_name] = split_line[1][5:-3]
-                else:
-                    self.table_pks[table_name] = split_line[1][5:-2]
+                pks = line[self.get_occurrence(line, "(", 1)+1:-2 if line[-1] == "," else -1]
+                pks = pks.split(",")
+                self.table_pks[table_name].extend([pk.strip() for pk in pks])
+                print(f"\nline = {line}")
+                print(f"pks = {self.table_pks[table_name]}")
 
             elif split_line[0].lower() == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
