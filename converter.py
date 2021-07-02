@@ -76,8 +76,6 @@ class Converter:
                 pks = line[self.get_occurrence(line, "(", 1)+1:-2 if line[-1] == "," else -1]
                 pks = pks.split(",")
                 self.table_pks[table_name].extend([pk.strip() for pk in pks])
-                print(f"\nline = {line}")
-                print(f"pks = {self.table_pks[table_name]}")
 
             elif split_line[0].lower() == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
