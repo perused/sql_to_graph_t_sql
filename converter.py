@@ -116,7 +116,7 @@ class Converter:
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
         first_bracket = self.get_occurrence(line, "(", 1) + 1
         vals = line[first_bracket:-2]
-        new_line = f"INSERT INTO {table_name} {columns} VALUES ({vals});\n\n"
+        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals.replace('"', "'")});\n\n"""
         self.converted += new_line
 
     # add edge tables for all possible relations between two tables - edges are not directed so A -> B == B -> A
