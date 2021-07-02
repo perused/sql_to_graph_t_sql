@@ -1,4 +1,4 @@
--- TAKEN FROM: https://docs.microsoft.com/en-us/sql/relational-databases/graphs/sql-graph-sample?view=sql-server-ver15
+-- source: https://docs.microsoft.com/en-us/sql/relational-databases/graphs/sql-graph-sample?view=sql-server-ver15
 
 -- Create a graph demo database
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE NAME = 'graphdemo')

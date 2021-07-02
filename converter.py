@@ -12,7 +12,7 @@ class Converter:
         self.tables = defaultdict(lambda: []) # tables and their fields
         self.table_pks = defaultdict(lambda: []) # tables and their primary keys
         self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
-        self.nodes = {} # (table_name, node_name): ID
+        # self.nodes = {} # (table_name, node_name): ID
         self.convert()
 
     def convert(self):
@@ -90,7 +90,7 @@ class Converter:
             else:
                 node = split_line[0].replace('"', '')
                 self.tables[table_name].append(node)
-                self.nodes[(table_name, node)] = id
+                # self.nodes[(table_name, node)] = id
                 id += 1
 
             i += 1
@@ -143,56 +143,67 @@ class Converter:
         return edges
 
     # add primary/foreign key edges to these tables
+    # TODO: 
+    # Currently utilises self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
+    # When we insert the edge we currently call: (SELECT $node_id FROM farm_competition WHERE ID = 4)
+    # In the given graph example, edges are inserted between specific values in tables. However, we are only able to identify relations between foreign keys (columns) and the keys they reference (also columns)
+    # This means that to place an edge between foreign and referenced keys, then we need to create an edge between every entry in the foreign key column and every entry in the referenced key column, which is n x m edges where n is the number of entries in the foreign key column and m is the number of edges in the referenced column. 
     def insert_edges(self, edge_table_names):
         for edge_name in edge_table_names:
-            original = edge_name
+            insertion = f"INSERT INTO {edge_name} VALUES\n"
             edge_name = edge_name.split("_to_")
             a = edge_name[0]
             b = edge_name[1]
             edges = set() # (node_a, node_b)
             count = 0
-            insertion = f"INSERT INTO {original} VALUES\n"
+            for foreign_key_triple in self.table_fks[a]:
+                for_key, ref_table, ref_key = foreign_key_triple
+                for left in for_key_vals_in_table:
+                    for right in ref_key_vals_in_table:
+                        # if edge doesnt already exist
+                        # insert edge from left to right 
+                        # write to insertion
 
-            # check for primary/foreign keys from a to b, add these edges to 'edges' and 'insertion'
-            for entry in self.table_fks[a]:
-                edge_from = entry[0]
-                edge_to = entry[2]
-                if (edge_from, edge_to) not in edges and (edge_to, edge_from) not in edges:
+    #         # check for primary/foreign keys from a to b, add these edges to 'edges' and 'insertion'
+    #         for entry in self.table_fks[a]:
+    #             edge_from = entry[0]
+    #             edge_to = entry[2]
+    #             if (edge_from, edge_to) not in edges and (edge_to, edge_from) not in edges:
 
-                    edges.add((edge_from, edge_to))
-                    edge_from_table = a
-                    edge_from_id = self.nodes[(edge_from_table, edge_from)]
-                    edge_to_table = entry[1]
-                    edge_to_id = self.nodes[(edge_to_table, edge_to)]
+    #                 edges.add((edge_from, edge_to))
+    #                 edge_from_table = a
+    #                 edge_from_id = self.nodes[(edge_from_table, edge_from)]
+    #                 edge_to_table = entry[1]
+    #                 edge_to_id = self.nodes[(edge_to_table, edge_to)]
 
-                    if count > 0:
-                        insertion += f"\t,((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
-                    else:
-                        insertion += f"\t ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+    #                 if count > 0:
+    #                     insertion += f"\t,((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+    #                 else:
+    #                     insertion += f"\t ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
 
-                    count += 1
+    #                 count += 1
 
-            # check for primary/foreign keys from b to a, add these edges if they are new to 'edges' 
-            for entry in self.table_fks[b]:
-                # TODO: below, but first the above needs to store which edges have been recorded!
-                edge_from = entry[0]
-                edge_to = entry[2]
-                if (edge_from, edge_to) not in edges and (edge_to, edge_from) not in edges:
+    #         # check for primary/foreign keys from b to a, add these edges if they are new to 'edges' 
+    #         for entry in self.table_fks[b]:
+    #             # TODO: below, but first the above needs to store which edges have been recorded!
+    #             edge_from = entry[0]
+    #             edge_to = entry[2]
+    #             if (edge_from, edge_to) not in edges and (edge_to, edge_from) not in edges:
 
-                    edge_from_table = b
-                    edge_from_id = self.nodes[(edge_from_table, edge_from)]
-                    edge_to_table = entry[1]
-                    edge_to_id = self.nodes[(edge_to_table, edge_to)]
-                    if count > 0:
-                        insertion += f"\t,((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
-                    else:
-                        insertion += f"\t ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+    #                 edge_from_table = b
+    #                 edge_from_id = self.nodes[(edge_from_table, edge_from)]
+    #                 edge_to_table = entry[1]
+    #                 edge_to_id = self.nodes[(edge_to_table, edge_to)]
+    #                 if count > 0:
+    #                     insertion += f"\t,((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
+    #                 else:
+    #                     insertion += f"\t ((SELECT $node_id FROM {edge_from_table} WHERE ID = {edge_from_id}), (SELECT $node_id FROM {edge_to_table} WHERE ID = {edge_to_id}))\n"
 
-                    count += 1
+    #                 count += 1
             
-            insertion += ";\n\n"
-            if count > 0:
-                self.converted += insertion
+    #         insertion += ";\n\n"
+    #         if count > 0:
+    #             self.converted += insertion
 
     # write the final output to path_converted.txt
     def write_output(self):
