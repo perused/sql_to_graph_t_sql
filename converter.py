@@ -4,7 +4,7 @@ import argparse
 from pprint import pprint
 from collections import defaultdict
 
-# converts an SQLite file to T-SQL
+# converts an SQLite file to T-SQL as a graph format (tested using Microsoft Azure SQL DB)
 class Converter:
     def __init__(self, path):
         self.path = path
