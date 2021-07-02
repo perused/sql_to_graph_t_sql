@@ -61,9 +61,12 @@ class Converter:
         id = 1
         while line != ");":
             # TODO: check if any inserts in spider are larger than 100 characters
+            # TODO: check if any spider fields have 'text' in them
             line = line.replace("text", "VARCHAR(100)")
             line = line.replace('`', '')
             line = line.replace('"', '')
+            # TODO: check if any inserts in spider have 'real' in them
+            line = line.replace("real", "FLOAT")
             self.converted += "\t" + line + "\n"
             split_line = line.split()
             # print(f"table {table_name} content: {line}")
@@ -116,7 +119,9 @@ class Converter:
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
         first_bracket = self.get_occurrence(line, "(", 1) + 1
         vals = line[first_bracket:-2]
-        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals.replace('"', "'")});\n\n"""
+        vals = vals.replace("'", "")
+        vals = vals.replace('"', "'")
+        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n\n"""
         self.converted += new_line
 
     # add edge tables for all possible relations between two tables - edges are not directed so A -> B == B -> A

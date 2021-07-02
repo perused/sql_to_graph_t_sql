@@ -2,8 +2,8 @@ CREATE TABLE "city" (
 	City_ID int,
 	Official_Name VARCHAR(100),
 	Status VARCHAR(100),
-	Area_km_2 real,
-	Population real,
+	Area_km_2 FLOAT,
+	Population FLOAT,
 	Census_Ranking VARCHAR(100),
 	PRIMARY KEY (City_ID)
 ) AS NODE;
@@ -11,14 +11,14 @@ CREATE TABLE "city" (
 CREATE TABLE "farm" (
 	Farm_ID int,
 	Year int,
-	Total_Horses real,
-	Working_Horses real,
-	Total_Cattle real,
-	Oxen real,
-	Bulls real,
-	Cows real,
-	Pigs real,
-	Sheep_and_Goats real,
+	Total_Horses FLOAT,
+	Working_Horses FLOAT,
+	Total_Cattle FLOAT,
+	Oxen FLOAT,
+	Bulls FLOAT,
+	Cows FLOAT,
+	Pigs FLOAT,
+	Sheep_and_Goats FLOAT,
 	PRIMARY KEY (Farm_ID)
 ) AS NODE;
 
@@ -73,7 +73,7 @@ INSERT INTO farm_competition (Competition_ID, Year, Theme, Host_city_ID, Hosts, 
 
 INSERT INTO farm_competition (Competition_ID, Year, Theme, Host_city_ID, Hosts, PRIMARY, FOREIGN) VALUES (3,'2005','MTV Asia Aid',3,'Alicia Keys');
 
-INSERT INTO farm_competition (Competition_ID, Year, Theme, Host_city_ID, Hosts, PRIMARY, FOREIGN) VALUES (4,'2004','Valentine's Day',4,'Vanness Wu and Michelle Branch');
+INSERT INTO farm_competition (Competition_ID, Year, Theme, Host_city_ID, Hosts, PRIMARY, FOREIGN) VALUES (4,'2004','Valentines Day',4,'Vanness Wu and Michelle Branch');
 
 INSERT INTO farm_competition (Competition_ID, Year, Theme, Host_city_ID, Hosts, PRIMARY, FOREIGN) VALUES (5,'2003','MTV Cube',5,'Shaggy and Coco Lee');
 
