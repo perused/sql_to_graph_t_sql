@@ -1,33 +1,33 @@
 CREATE TABLE "battle" (
-	"id" int,
-	"name" VARCHAR(100),
-	"date" VARCHAR(100),
-	"bulgarian_commander" VARCHAR(100),
-	"latin_commander" VARCHAR(100),
-	"result" VARCHAR(100),
-	primary key("id")
+	id int,
+	name VARCHAR(100),
+	date VARCHAR(100),
+	bulgarian_commander VARCHAR(100),
+	latin_commander VARCHAR(100),
+	result VARCHAR(100),
+	primary key(id)
 ) AS NODE;
 
 CREATE TABLE "ship" (
-	"lost_in_battle" int,
-	"id" int,
-	"name" VARCHAR(100),
-	"tonnage" VARCHAR(100),
-	"ship_type" VARCHAR(100),
-	"location" VARCHAR(100),
-	"disposition_of_ship" VARCHAR(100),
-	primary key("id"),
-	foreign key ("lost_in_battle") references "battle"("id")
+	lost_in_battle int,
+	id int,
+	name VARCHAR(100),
+	tonnage VARCHAR(100),
+	ship_type VARCHAR(100),
+	location VARCHAR(100),
+	disposition_of_ship VARCHAR(100),
+	primary key(id),
+	foreign key (lost_in_battle) references battle(id)
 ) AS NODE;
 
 CREATE TABLE "death" (
-	"caused_by_ship_id" int,
-	"id" int,
-	"note" VARCHAR(100),
-	"killed" int,
-	"injured" int,
-	primary key("id"),
-	foreign key ("caused_by_ship_id") references "ship"("id")
+	caused_by_ship_id int,
+	id int,
+	note VARCHAR(100),
+	killed int,
+	injured int,
+	primary key(id),
+	foreign key (caused_by_ship_id) references ship(id)
 ) AS NODE;
 
 INSERT INTO battle (id, name, date, bulgarian_commander, latin_commander, result) VALUES (1,"Battle of Adrianople","14 April 1205","Kaloyan","Baldwin I","Bulgarian victory");
@@ -91,13 +91,13 @@ CREATE TABLE battle_to_ship AS EDGE;
 CREATE TABLE battle_to_death AS EDGE;
 CREATE TABLE ship_to_death AS EDGE;
 
+INSERT INTO battle_to_ship VALUES
+	 ((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
+;
+
 INSERT INTO ship_to_death VALUES
 	 ((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
 	,((SELECT $node_id FROM death WHERE ID = 1), (SELECT $node_id FROM ship WHERE ID = 2))
-;
-
-INSERT INTO battle_to_ship VALUES
-	 ((SELECT $node_id FROM ship WHERE ID = 1), (SELECT $node_id FROM battle WHERE ID = 1))
 ;
 
 INSERT INTO battle_to_death VALUES

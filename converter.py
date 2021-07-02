@@ -62,7 +62,8 @@ class Converter:
         while line != ");":
             # TODO: check if any inserts in spider are larger than 100 characters
             line = line.replace("text", "VARCHAR(100)")
-            line = line.replace('`', '"')
+            line = line.replace('`', '')
+            line = line.replace('"', '')
             self.converted += "\t" + line + "\n"
             split_line = line.split()
             # print(f"table {table_name} content: {line}")
@@ -74,13 +75,13 @@ class Converter:
                     self.table_pks[table_name] = split_line[1][5:-2]
 
             elif split_line[0] == "foreign":
-                # string manipulation to extract mentions of foreign key, referenced table and referenced key from this line
-                for_key = split_line[2][2:-2]
-                ref_table = split_line[4][1:self.get_occurrence(split_line[4], '"', 2)]
+                # extract mention of foreign key, referenced table and referenced key from this line
+                for_key = split_line[2][1:-1]
+                ref_table = split_line[4][:self.get_occurrence(split_line[4], "(", 1)]
                 if line[-1] == ",":
-                    ref_key = split_line[4][self.get_occurrence(split_line[4], '"', 3)+1:-3]
+                    ref_key = split_line[4][self.get_occurrence(split_line[4], '(', 1)+1:-2]
                 else:
-                    ref_key = split_line[4][self.get_occurrence(split_line[4], '"', 3)+1:-2]
+                    ref_key = split_line[4][self.get_occurrence(split_line[4], '(', 1)+1:-1]
                 self.table_fks[table_name].append((for_key, ref_table, ref_key))
 
             else:
