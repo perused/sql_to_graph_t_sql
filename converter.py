@@ -12,7 +12,7 @@ class Converter:
         self.tables = defaultdict(lambda: []) # tables and their fields
         self.table_pks = defaultdict(lambda: []) # tables and their primary keys
         self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
-        # self.nodes = {} # (table_name, node_name): ID
+        self.table_vals = defaultdict(lambda: []) # (table_name, col_name): [vals...]
         self.convert()
 
     def convert(self):
@@ -113,6 +113,7 @@ class Converter:
         return None
 
     # convert sqlite insert statement to valid T-SQL insert statement
+    # self.table_vals = defaultdict(lambda: []) # (table_name, col_name): [vals...]
     def convert_insert(self, line):
         split_line = line.split()
         table_name = split_line[2].replace('"', '')
@@ -123,6 +124,12 @@ class Converter:
         vals = vals.replace('"', "'")
         new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n\n"""
         self.converted += new_line
+
+        # storing of values for later usage
+        # TODO: check that no entries have commas in them 
+        vals_list = vals.replace("'", "").split(",")
+        for col, val in zip(self.tables[table_name], vals_list):
+            self.table_vals[(table_name, col)].append(val)
 
     # add edge tables for all possible relations between two tables - edges are not directed so A -> B == B -> A
     # return the set of edge table names
@@ -156,10 +163,20 @@ class Converter:
             b = edge_name[1]
             edges = set() # (node_a, node_b)
             count = 0
+
+            # table_vals: (table, col): val
+            # table_fks: table: (for_key, ref_table, ref_key)
+
+
+            print(f"\ntable_vals = {self.table_vals}\n")
+
             for foreign_key_triple in self.table_fks[a]:
                 for_key, ref_table, ref_key = foreign_key_triple
-                for left in for_key_vals_in_table:
-                    for right in ref_key_vals_in_table:
+                # for val in self.table_vals
+
+                # to make the below loops work, we need some storage like:
+                # for left in for_key_vals_in_table_a:
+                #     for right in ref_key_vals_in_table_ref:
                         # if edge doesnt already exist
                         # insert edge from left to right 
                         # write to insertion

@@ -111,27 +111,3 @@ CREATE TABLE farm_to_farm_competition AS EDGE;
 CREATE TABLE farm_to_competition_record AS EDGE;
 CREATE TABLE farm_competition_to_competition_record AS EDGE;
 
-INSERT INTO farm_to_competition_record VALUES
-	 ((SELECT $node_id FROM competition_record WHERE ID = 1), (SELECT $node_id FROM farm_competition WHERE ID = 1))
-	,((SELECT $node_id FROM competition_record WHERE ID = 2), (SELECT $node_id FROM farm WHERE ID = 1))
-;
-
-INSERT INTO farm_to_farm_competition VALUES
-	 ((SELECT $node_id FROM farm_competition WHERE ID = 4), (SELECT $node_id FROM city WHERE ID = 1))
-;
-
-INSERT INTO city_to_competition_record VALUES
-	 ((SELECT $node_id FROM competition_record WHERE ID = 1), (SELECT $node_id FROM farm_competition WHERE ID = 1))
-	,((SELECT $node_id FROM competition_record WHERE ID = 2), (SELECT $node_id FROM farm WHERE ID = 1))
-;
-
-INSERT INTO farm_competition_to_competition_record VALUES
-	 ((SELECT $node_id FROM farm_competition WHERE ID = 4), (SELECT $node_id FROM city WHERE ID = 1))
-	,((SELECT $node_id FROM competition_record WHERE ID = 1), (SELECT $node_id FROM farm_competition WHERE ID = 1))
-	,((SELECT $node_id FROM competition_record WHERE ID = 2), (SELECT $node_id FROM farm WHERE ID = 1))
-;
-
-INSERT INTO city_to_farm_competition VALUES
-	 ((SELECT $node_id FROM farm_competition WHERE ID = 4), (SELECT $node_id FROM city WHERE ID = 1))
-;
-
