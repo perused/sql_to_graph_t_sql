@@ -149,6 +149,18 @@ class Converter:
         self.converted += "\n"
         return edges
 
+    # add primary/foreign key edges to tables, create them if they don't already exist
+    # TODO: NEW IDEA
+    # loop through the foreign key tables and create edges for these
+    # edge tables are created on the fly
+    # def add_edges(self):
+    #     tables = self.tables.keys()
+    #     self.create_edges = ""
+    #     self.insert_edges = ""
+    #     for table_name in tables:
+    #         for for_key, ref_table, ref_key in self.table_fks[table_name]:
+    #             print(for_key, ref_table, ref_key)
+
     # add primary/foreign key edges to these tables
     # TODO: 
     # Currently utilises self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
@@ -159,8 +171,8 @@ class Converter:
         for edge_name in edge_table_names:
             insertion = f"INSERT INTO {edge_name} VALUES\n"
             edge_name = edge_name.split("_to_")
-            a = edge_name[0]
-            b = edge_name[1]
+            left_table = edge_name[0]
+            right_table = edge_name[1]
             edges = set() # (node_a, node_b)
             count = 0
 
@@ -170,9 +182,10 @@ class Converter:
 
             print(f"\ntable_vals = {self.table_vals}\n")
 
-            for foreign_key_triple in self.table_fks[a]:
-                for_key, ref_table, ref_key = foreign_key_triple
-                # for val in self.table_vals
+    #         for foreign_key_triple in self.table_fks[a]:
+    #             for_key, ref_table, ref_key = foreign_key_triple
+    #             for left_val in self.table_vals[(a, for_key)]:
+    #                 for right_val in self.table_vals
 
                 # to make the below loops work, we need some storage like:
                 # for left in for_key_vals_in_table_a:
