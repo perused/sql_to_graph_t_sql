@@ -26,6 +26,6 @@ Python script tested on OSX environment only so far and paths have been hardcode
 
 SQL only tested in Microsoft Azure SQL DB environment only.
 
-.sql schemas have only been tested using the Spider dataset (https://yale-lily.github.io/spider), so since it is untested on all other datasets it will likely run into issues there as well. 
+.sql schemas have only been obtained from the Spider dataset (https://yale-lily.github.io/spider), other datasets may not be compatible and will require tweaks. 
 
 Still in development stage so issues with Spider dataset are undergoing fixes too. 
