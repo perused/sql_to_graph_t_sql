@@ -174,7 +174,7 @@ class Converter:
                 continue
             self.converted += f"INSERT INTO {edge_table_name} VALUES\n"
             for query in edge_queries[idx]:
-                if query == edge_queries[idx][-1]:
+                if query == edge_queries[idx][0]:
                     self.converted += "\t " + query + "\n"
                 else:
                     self.converted += "\t," + query + "\n"
