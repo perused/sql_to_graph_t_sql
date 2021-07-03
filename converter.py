@@ -17,8 +17,7 @@ class Converter:
 
     def convert(self):
         self.convert_file()
-        edges = self.add_edge_tables()
-        self.insert_edges(edges)
+        self.add_edges()
         self.write_output()
     
     # converts schema into t-sql format (including replacing data types in tables and changing format of insert statements), adds tables + primary keys + foreign keys to instance dictionaries and adds AS NODE to end of tables
@@ -133,33 +132,33 @@ class Converter:
 
     # add edge tables for all possible relations between two tables - edges are not directed so A -> B == B -> A
     # return the set of edge table names
-    def add_edge_tables(self):
-        tables = self.tables.keys()
-        edges = set()
-        self.converted += "\n"
-        for a in tables:
-            for b in tables:
-                if a == b:
-                    continue
-                if f"{a}_to_{b}" not in edges and f"{b}_to_{a}" not in edges:
-                    # add the edge and its table
-                    edge_name = f"{a}_to_{b}"
-                    edges.add(edge_name)
-                    self.converted += f"CREATE TABLE {edge_name} AS EDGE;\n"
-        self.converted += "\n"
-        return edges
+    # def add_edge_tables(self):
+    #     tables = self.tables.keys()
+    #     edges = set()
+    #     self.converted += "\n"
+    #     for a in tables:
+    #         for b in tables:
+    #             if a == b:
+    #                 continue
+    #             if f"{a}_to_{b}" not in edges and f"{b}_to_{a}" not in edges:
+    #                 # add the edge and its table
+    #                 edge_name = f"{a}_to_{b}"
+    #                 edges.add(edge_name)
+    #                 self.converted += f"CREATE TABLE {edge_name} AS EDGE;\n"
+    #     self.converted += "\n"
+    #     return edges
 
     # add primary/foreign key edges to tables, create them if they don't already exist
     # TODO: NEW IDEA
     # loop through the foreign key tables and create edges for these
     # edge tables are created on the fly
-    # def add_edges(self):
-    #     tables = self.tables.keys()
-    #     self.create_edges = ""
-    #     self.insert_edges = ""
-    #     for table_name in tables:
-    #         for for_key, ref_table, ref_key in self.table_fks[table_name]:
-    #             print(for_key, ref_table, ref_key)
+    def add_edges(self):
+        tables = self.tables.keys()
+        self.create_edges = ""
+        self.insert_edges = ""
+        for table_name in tables:
+            for for_key, ref_table, ref_key in self.table_fks[table_name]:
+                print(for_key, ref_table, ref_key)
 
     # add primary/foreign key edges to these tables
     # TODO: 
@@ -167,20 +166,20 @@ class Converter:
     # When we insert the edge we currently call: (SELECT $node_id FROM farm_competition WHERE ID = 4)
     # In the given graph example, edges are inserted between specific values in tables. However, we are only able to identify relations between foreign keys (columns) and the keys they reference (also columns)
     # This means that to place an edge between foreign and referenced keys, then we need to create an edge between every entry in the foreign key column and every entry in the referenced key column, which is n x m edges where n is the number of entries in the foreign key column and m is the number of edges in the referenced column. 
-    def insert_edges(self, edge_table_names):
-        for edge_name in edge_table_names:
-            insertion = f"INSERT INTO {edge_name} VALUES\n"
-            edge_name = edge_name.split("_to_")
-            left_table = edge_name[0]
-            right_table = edge_name[1]
-            edges = set() # (node_a, node_b)
-            count = 0
+    # def insert_edges(self, edge_table_names):
+    #     for edge_name in edge_table_names:
+    #         insertion = f"INSERT INTO {edge_name} VALUES\n"
+    #         edge_name = edge_name.split("_to_")
+    #         left_table = edge_name[0]
+    #         right_table = edge_name[1]
+    #         edges = set() # (node_a, node_b)
+    #         count = 0
 
-            # table_vals: (table, col): val
-            # table_fks: table: (for_key, ref_table, ref_key)
+    #         # table_vals: (table, col): val
+    #         # table_fks: table: (for_key, ref_table, ref_key)
 
 
-            print(f"\ntable_vals = {self.table_vals}\n")
+    #         print(f"\ntable_vals = {self.table_vals}\n")
 
     #         for foreign_key_triple in self.table_fks[a]:
     #             for_key, ref_table, ref_key = foreign_key_triple

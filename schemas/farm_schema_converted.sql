@@ -103,11 +103,3 @@ INSERT INTO competition_record (Competition_ID, Farm_ID, Rank) VALUES (5,5,1);
 
 INSERT INTO competition_record (Competition_ID, Farm_ID, Rank) VALUES (5,3,2);
 
-
-CREATE TABLE city_to_farm AS EDGE;
-CREATE TABLE city_to_farm_competition AS EDGE;
-CREATE TABLE city_to_competition_record AS EDGE;
-CREATE TABLE farm_to_farm_competition AS EDGE;
-CREATE TABLE farm_to_competition_record AS EDGE;
-CREATE TABLE farm_competition_to_competition_record AS EDGE;
-
