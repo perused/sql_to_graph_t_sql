@@ -20,9 +20,11 @@ python converter.py 1 "directory-name"
 
 e.g (not implemented yet)
 
-## Issues
+## Important Notes and Potential Issues
 
-Tested on OSX environment only so far and paths have been hardcoded in rather than using os library - problems with paths will probably be encountered in a Windows environment. 
+Python script tested on OSX environment only so far and paths have been hardcoded in rather than using os library - problems with paths will probably be encountered in a Windows environment. 
+
+SQL only tested in Microsoft Azure SQL DB environment only.
 
 .sql schemas have only been tested using the Spider dataset (https://yale-lily.github.io/spider), so since it is untested on all other datasets it will likely run into issues there as well. 
 
