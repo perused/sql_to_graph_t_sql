@@ -125,6 +125,7 @@ class Converter:
         self.converted += new_line
 
         # storing of values for later usage
+        # technically for foreign <-> primary key edges we only need to store foreign and primary key values, but for extensibility sake we will store all
         # TODO: check that no entries have commas in them 
         vals_list = vals.replace("'", "").split(",")
         for col, val in zip(self.tables[table_name], vals_list):
@@ -154,11 +155,34 @@ class Converter:
     # edge tables are created on the fly
     def add_edges(self):
         tables = self.tables.keys()
+        edge_tables = {} # table_to_table: idx
+        edge_queries = [] # idx corresponds to edge_tables idx
+        edges_added = {} # (from_table, from_col): (to_table, to_col)
+        count = 0
         self.create_edges = ""
-        self.insert_edges = ""
-        for table_name in tables:
-            for for_key, ref_table, ref_key in self.table_fks[table_name]:
-                print(for_key, ref_table, ref_key)
+        for from_table in tables:
+            for from_col, to_table, to_col in self.table_fks[from_table]:
+
+                # If we created edges from this tables from col to the other tables to col before, skip
+                if (from_table, to_table) in edges_added 
+
+                edge_table_a = f"{from_table}_to_{to_table}"
+                edge_table_b = f"{to_table}_to_{from_table}"
+
+                if edge_table_a in edge_tables.keys():
+                    idx = edge_tables[edge_table_a]
+                elif edge_table_b in edge_tables.keys():
+                    idx = edge_tables[edge_table_b]
+                else:
+                    edge_tables[edge_table_a] = count
+                    edge_queries.append([])
+                    idx = count
+                    count += 1
+
+                for from_val in self.table_vals[(from_table, from_col)]:
+                    for to_val in self.table_vals[(to_table, to_col)]:
+                        query = f"((SELECT $node_id FROM {from_table} WHERE {from_col} = {from_val}), (SELECT $node_id FROM {to_table} WHERE {to_col} = {to_val}))"
+                        edge_queries[idx].append(query)  
 
     # add primary/foreign key edges to these tables
     # TODO: 
