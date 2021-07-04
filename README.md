@@ -4,7 +4,7 @@
 
 A program that takes in a file or directory that points to sqlite schema files and converts these files into T-SQL schema graphs as per https://docs.microsoft.com/en-us/sql/relational-databases/graphs/sql-graph-overview?view=sql-server-ver15
 
-Creates an edge between primary and foreign keys between tables
+Creates an edge between primary and foreign keys between tables -> currently this does not actually execute in Azure since foreign keys are not primary and therefore have duplicate values, which does not work for creating edges. Working on a solution now. 
 
 ## Usage
 

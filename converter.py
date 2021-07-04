@@ -139,6 +139,11 @@ class Converter:
         edge_tables = {} # table_to_table: idx
         edge_queries = [] # idx corresponds to edge_tables idx
         count = 0
+
+        # issue: foreign key references primary key as an edge doesn't work since even though fk and pk are just single columns, nodes are entire rows in the table, and therefore we will just be connecting an entire row to another entire row
+        # using the below method just creates an edge between every edge in the table
+        # issue: we are currently selecting from_col and to_col, but these are not primary keys and so the values are not unique
+
         for from_table in tables:
             for from_col, to_table, to_col in self.table_fks[from_table]:
 
