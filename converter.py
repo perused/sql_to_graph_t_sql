@@ -1,4 +1,5 @@
 import os
+from posixpath import split
 import sys
 import argparse
 from pprint import pprint
@@ -69,19 +70,25 @@ class Converter:
             # TODO: check if any inserts in spider have 'real' in them
             line = line.replace("real", "FLOAT")
             self.converted += "\t" + line + "\n"
-            split_line = line.split()
+            split_line = line.lower().split()
             # print(f"table {table_name} content: {line}")
 
             # TODO: account for if there is a double or more primary key
-            if split_line[0].lower() == "primary":
-                pks = line[self.get_occurrence(line, "(", 1)+1:-2 if line[-1] == "," else -1]
+            if split_line[0] == "primary":
+                pks = line[line.index("(")+1:-2 if line[-1] == "," else -1]
                 pks = pks.split(",")
                 self.table_pks[table_name].extend([pk.strip() for pk in pks])
 
-            elif split_line[0].lower() == "foreign":
+            elif split_line[0] == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
                 for_key = split_line[2][1:-1]
-                word_idx, bracket_idx = self.get_occurrence_from(split_line, 4, "(", 1)
+                bracket_idx = None
+                word_idx = split_line.index("references")
+                while not bracket_idx and word_idx < len(split_line):
+                    try:
+                        bracket_idx = split_line[word_idx].index("(")
+                    except:
+                        word_idx += 1
                 ref_table = split_line[word_idx][:bracket_idx]
                 if line[-1] == ",":
                     ref_key = split_line[word_idx][bracket_idx+1:-2]
@@ -102,37 +109,15 @@ class Converter:
 
         return i
 
-    # will search along the rest of the split line for the char before giving up, unlike get_occurrence
-    def get_occurrence_from(self, split_line, idx, char, occ):
-        word_idx = idx
-        while True:
-            bracket_idx = self.get_occurrence(split_line[word_idx], char, occ)
-            if not bracket_idx:
-                word_idx += 1
-            else:
-                return word_idx, bracket_idx
-        raise Exception(f"Get occurrence from called on string '{split_line}' looking for the {occ}{'st' if occ == 1 else 'th'} occurence of the char '{char}', but not found anywhere from idx {idx} onwards.")
- 
-    # given the desired index of occurrence of a character, return the index of that character at that occurrence. Assumes occ > 0. None if not found
-    def get_occurrence(self, string, char, occ):
-        i = 0
-        count = 0
-        while i < len(string):
-            if string[i] == char:
-                count += 1
-                if count == occ:
-                    return i
-            i += 1
-        return None
-
     # convert sqlite insert statement to valid T-SQL insert statement
     # self.table_vals = defaultdict(lambda: []) # (table_name, col_name): [vals...]
     def convert_insert(self, line):
+        lower_line = line.lower()
         split_line = line.split()
         table_name = split_line[2].replace('"', '')
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
-        first_bracket = self.get_occurrence(line, "(", 1) + 1
-        vals = line[first_bracket:-2]
+        vals_bracket = line.index("(", lower_line.index("values")) + 1
+        vals = line[vals_bracket:-2]
         vals = vals.replace("'", "")
         vals = vals.replace("`", "'")
         vals = vals.replace('"', "'")
