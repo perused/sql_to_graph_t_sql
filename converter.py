@@ -39,6 +39,7 @@ class Converter:
                 # TODO: check if there are any two word table names in the DB
                 table_name = split_line[2]
                 table_name = table_name.replace('"', '')
+                table_name = table_name.replace('`', '')
                 i = self.convert_table(contents, i, table_name)
 
             # insert
@@ -55,7 +56,7 @@ class Converter:
     # add AS NODE to end of table
     # add to self.converted
     def convert_table(self, contents, i, table_name):
-        self.converted += contents[i]
+        self.converted += contents[i].replace("`", '')
         i += 1
         line = contents[i].strip()
         id = 1
@@ -133,6 +134,7 @@ class Converter:
         first_bracket = self.get_occurrence(line, "(", 1) + 1
         vals = line[first_bracket:-2]
         vals = vals.replace("'", "")
+        vals = vals.replace("`", "'")
         vals = vals.replace('"', "'")
         new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n\n"""
         self.converted += new_line
