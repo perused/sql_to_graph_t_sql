@@ -17,8 +17,8 @@ class Converter:
 
     def convert(self):
         self.convert_file()
-        edge_tables, edge_queries = self.add_edges()
-        self.insert_edges(edge_tables, edge_queries)
+        # edge_tables, edge_queries = self.add_edges()
+        # self.insert_edges(edge_tables, edge_queries)
         self.write_output()
     
     # converts schema into t-sql format (including replacing data types in tables and changing format of insert statements), adds tables + primary keys + foreign keys to instance dictionaries and adds AS NODE to end of tables
@@ -80,11 +80,12 @@ class Converter:
             elif split_line[0].lower() == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
                 for_key = split_line[2][1:-1]
-                ref_table = split_line[4][:self.get_occurrence(split_line[4], "(", 1)]
+                word_idx, bracket_idx = self.get_occurrence_from(split_line, 4, "(", 1)
+                ref_table = split_line[word_idx][:bracket_idx]
                 if line[-1] == ",":
-                    ref_key = split_line[4][self.get_occurrence(split_line[4], '(', 1)+1:-2]
+                    ref_key = split_line[word_idx][bracket_idx+1:-2]
                 else:
-                    ref_key = split_line[4][self.get_occurrence(split_line[4], '(', 1)+1:-1]
+                    ref_key = split_line[word_idx][bracket_idx+1:-1]
                 self.table_fks[table_name].append((for_key, ref_table, ref_key))
 
             else:
@@ -100,6 +101,17 @@ class Converter:
 
         return i
 
+    # will search along the rest of the split line for the char before giving up, unlike get_occurrence
+    def get_occurrence_from(self, split_line, idx, char, occ):
+        word_idx = idx
+        while True:
+            bracket_idx = self.get_occurrence(split_line[word_idx], char, occ)
+            if not bracket_idx:
+                word_idx += 1
+            else:
+                return word_idx, bracket_idx
+        raise Exception(f"Get occurrence from called on string '{split_line}' looking for the {occ}{'st' if occ == 1 else 'th'} occurence of the char '{char}', but not found anywhere from idx {idx} onwards.")
+ 
     # given the desired index of occurrence of a character, return the index of that character at that occurrence. Assumes occ > 0. None if not found
     def get_occurrence(self, string, char, occ):
         i = 0
@@ -193,7 +205,7 @@ class Converter:
         new_path += "_converted.sql"
         with open(new_path, "w") as fp:
             fp.write(self.converted)
-        print(f"Converted output written to '{new_path}'.")
+        print(f"Successfully converted '{self.path}' to '{new_path}'")
 
 # process command line arguments
 # returns: args - namespace of command line arguments
@@ -216,13 +228,23 @@ def process_args():
 def main():
     args = process_args()
     if args.file_flag == 0:
-        c = Converter(args.path)
+        Converter(args.path)
     else:
         for root, dirs, files in os.walk(args.path):
             for name in files:
-                print(os.path.join(root, name))
-            for name in dirs:
-                print(os.path.join(root, name))
+                path = os.path.join(root, name)
+                with open(path, "r") as fp:
+                    try:
+                        line_one = fp.readline().strip().split()
+                        test = line_one[0].lower() == "pragma"
+                    except:
+                        continue
+                    if test:
+                        print(f"Attempting to convert '{path}'")
+                        Converter(path)
+                # print(os.path.join(root, name))
+            # for name in dirs:
+            #     print(os.path.join(root, name))
 
 if __name__ == "__main__":
     main()
