@@ -84,7 +84,7 @@ class Converter:
             if split_line[0] == "primary":
                 pks = line[line.index("(")+1:-2 if line[-1] == "," else -1]
                 pks = pks.split(",")
-                self.table_pks[table_name].extend([pk.strip() for pk in pks])
+                self.table_pks[table_name].extend([pk.strip().lower() for pk in pks])
 
             elif split_line[0] == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
@@ -125,7 +125,7 @@ class Converter:
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
         vals_bracket = line.index("(", lower_line.index("values")) + 1
         vals = line[vals_bracket:-2]
-        # vals = vals.replace("'", "")
+        vals = vals.replace("'", "")
         vals = vals.replace("`", "'")
         vals = vals.replace('"', "'")
         new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n"""
@@ -133,7 +133,7 @@ class Converter:
 
         # storing of values for later usage
         # technically for foreign <-> primary key edges we only need to store foreign and primary key values, but for extensibility sake we will store all
-        # TODO: check that no entries have commas in them 
+        # TODO: check that no entries have commas in them - will get an error when zipping them together later probably
         vals_list = vals.replace("'", "").split(",")
         for col, val in zip(self.tables[table_name], vals_list):
             self.table_vals[(table_name, col)].append(val)
@@ -142,16 +142,12 @@ class Converter:
 
     # given a table name and their single or composite primary key/s, return the list of queries for that table 
     def get_pk_queries(self, table_name, pks):
-# f"(SELECT $node_id FROM {table_name} WHERE {pk_col} = {pk_val_1})" - 1 pk
-# f"(SELECT $node_id FROM {table_name} WHERE {pk_col1} = {pk_val} AND {pk_col2} = {pk_val})" - 2 pks
-# f"(SELECT $node_id FROM {table_name} WHERE {pk_col1} = {pk_val} AND {pk_col2} = {pk_val} AND {pk_col2} = {pk_val})" - 3 pks
-        # self.table_vals = defaultdict(lambda: []) # (table_name, col_name): [vals...]
-        # so in order to be able to account for > 1 pk, we need to store table pk values when a table has more than one pk
-        
-        if len(pks) == 1:
+        if len(pks) == 0:
+            raise Exception(f"Recorded zero primary keys for {table_name}")
+        elif len(pks) == 1:
             return self.get_single_pk_queries(table_name, pks[0])
         elif len(pks) == 2:
-            raise Exception("Two primary keys not implemented yet.")
+            return self.get_double_pk_queries(table_name, pks)
         elif len(pks) == 3:
             raise Exception("Three primary keys not implemented yet.")
         elif len(pks) >= 4:
@@ -161,6 +157,12 @@ class Converter:
         queries = []
         for val in self.table_vals[(table_name, pk_col)]:
             queries.append(f"(SELECT $node_id FROM {table_name} WHERE {pk_col} = {val})")
+        return queries
+
+    def get_double_pk_queries(self, table_name, pks):
+        queries = []
+        for val_a, val_b in zip(self.table_vals[(table_name, pks[0])], self.table_vals[(table_name, pks[1])]):
+            queries.append(f"(SELECT $node_id FROM {table_name} WHERE {pks[0]} = {val_a} AND {pks[1]} = {val_b})")
         return queries
 
     # create an edge between all primary keys in all tables
