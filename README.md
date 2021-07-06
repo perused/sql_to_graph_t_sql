@@ -14,11 +14,11 @@ python converter.py 0 file-path
 
 e.g python converter.py 0 schemas/battle_schema.sql
 
-Usage for a directory (not implemented yet):
+Usage for a directory:
 
 python converter.py 1 "directory-name"
 
-e.g (not implemented yet)
+e.g python converter.py 1 schemas
 
 ## Important Notes and Potential Issues
 

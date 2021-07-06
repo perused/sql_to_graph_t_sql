@@ -5,6 +5,8 @@ import argparse
 from pprint import pprint
 from collections import defaultdict
 
+ADD_EDGES = True
+
 # converts an SQLite file to T-SQL as a graph format (tested using Microsoft Azure SQL DB)
 class Converter:
     def __init__(self, path):
@@ -18,8 +20,8 @@ class Converter:
 
     def convert(self):
         self.convert_file()
-        # edge_tables, edge_queries = self.add_edges()
-        # self.insert_edges(edge_tables, edge_queries)
+        edge_tables, edge_queries = self.add_edges()
+        self.insert_edges(edge_tables, edge_queries)
         self.write_output()
     
     # converts schema into t-sql format (including replacing data types in tables and changing format of insert statements), adds tables + primary keys + foreign keys to instance dictionaries and adds AS NODE to end of tables
@@ -28,6 +30,7 @@ class Converter:
         contents = fp.readlines()
         fp.close()
         i = 0
+        prev_insert = None
         while i < len(contents):
             line = contents[i].strip()
             split_line = line.split()
@@ -45,7 +48,13 @@ class Converter:
 
             # insert
             elif split_line[0].upper() == "INSERT":
-                self.convert_insert(line)
+                table = self.convert_insert(line)
+                if prev_insert == None:
+                    prev_insert = table
+                elif prev_insert != table:
+                    self.converted += "\n"
+                    prev_insert = table
+
 
             i += 1
 
@@ -118,10 +127,10 @@ class Converter:
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
         vals_bracket = line.index("(", lower_line.index("values")) + 1
         vals = line[vals_bracket:-2]
-        vals = vals.replace("'", "")
+        # vals = vals.replace("'", "")
         vals = vals.replace("`", "'")
         vals = vals.replace('"', "'")
-        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n\n"""
+        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n"""
         self.converted += new_line
 
         # storing of values for later usage
@@ -130,6 +139,8 @@ class Converter:
         vals_list = vals.replace("'", "").split(",")
         for col, val in zip(self.tables[table_name], vals_list):
             self.table_vals[(table_name, col)].append(val)
+
+        return table_name
 
     # for every foreign key relation, create an edge table between the two tables if it doesn't exist and then create an edge between all the values from the foreign key column to the referenced key column
     # returns a dictionary of edge table names: indexes and a list of queries where the index of the queries corresponds to the edge table name index
