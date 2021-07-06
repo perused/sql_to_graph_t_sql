@@ -92,6 +92,7 @@ class Converter:
             elif "primary key" in lower_line:
                 pk = split_line[0].strip().lower()
                 self.table_pks[table_name].extend([pk])
+                self.tables[table_name].append(pk)
 
             elif split_line[0] == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
@@ -120,6 +121,8 @@ class Converter:
             line = contents[i].strip()
 
         self.converted += ") AS NODE;" + "\n\n"
+        for pair in self.table_vals.keys():
+            print(pair)
 
         return i
 
@@ -162,8 +165,11 @@ class Converter:
 
     def get_single_pk_queries(self, table_name, pk_col):
         queries = []
+        print(f"table name = {table_name}, pk col = {pk_col}")
+        print(f"pk vals = {self.table_vals[(table_name, pk_col)]}")
         for val in self.table_vals[(table_name, pk_col)]:
             queries.append(f"(SELECT $node_id FROM {table_name} WHERE {pk_col} = {val})")
+        print(f"queries = {queries}")
         return queries
 
     def get_double_pk_queries(self, table_name, pks):
