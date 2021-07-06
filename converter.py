@@ -43,6 +43,7 @@ class Converter:
                 table_name = table_name.replace('"', '')
                 table_name = table_name.replace('`', '')
                 i = self.convert_table(contents, i, table_name)
+                prev_insert = None
 
             # insert
             elif split_line[0].upper() == "INSERT":
@@ -64,7 +65,7 @@ class Converter:
     # add AS NODE to end of table
     # add to self.converted
     def convert_table(self, contents, i, table_name):
-        self.converted += contents[i].replace("`", '')
+        self.converted += "\n" + contents[i].replace("`", '')
         i += 1
         line = contents[i].strip()
         id = 1
@@ -78,13 +79,19 @@ class Converter:
             line = line.replace("real", "FLOAT")
             self.converted += "\t" + line + "\n"
             split_line = line.lower().split()
+            lower_line = line.lower()
             # print(f"table {table_name} content: {line}")
 
-            # TODO: account for if there is a double or more primary key
+            # accounts for if there is a double or more primary key
             if split_line[0] == "primary":
                 pks = line[line.index("(")+1:-2 if line[-1] == "," else -1]
                 pks = pks.split(",")
                 self.table_pks[table_name].extend([pk.strip().lower() for pk in pks])
+
+            # accounts for if primary key is specified at the end of the field
+            elif "primary key" in lower_line:
+                pk = split_line[0].strip().lower()
+                self.table_pks[table_name].extend([pk])
 
             elif split_line[0] == "foreign":
                 # extract mention of foreign key, referenced table and referenced key from this line
@@ -149,9 +156,9 @@ class Converter:
         elif len(pks) == 2:
             return self.get_double_pk_queries(table_name, pks)
         elif len(pks) == 3:
-            raise Exception("Three primary keys not implemented yet.")
+            raise Exception(f"Three primary keys not implemented yet. Table name = {table_name} and supposed pks = {pks}")
         elif len(pks) >= 4:
-            raise Exception("Four or more primary keys not implemented yet.")
+            raise Exception(f"Four or more primary keys not implemented yet. Table name = {table_name} and supposed pks = {pks}")
 
     def get_single_pk_queries(self, table_name, pk_col):
         queries = []
