@@ -5,7 +5,7 @@ import argparse
 from pprint import pprint
 from collections import defaultdict
 
-ADD_EDGES = True
+# ADD_EDGES = True
 
 # converts an SQLite file to T-SQL as a graph format (tested using Microsoft Azure SQL DB)
 class Converter:

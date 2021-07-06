@@ -4,7 +4,7 @@
 
 A Python progam that, when given a path to a file or directory, converts all sqlite files in the path to T-SQL schema graphs as per https://docs.microsoft.com/en-us/sql/relational-databases/graphs/sql-graph-overview?view=sql-server-ver15
 
-Creates an edge between primary and foreign keys between tables -> currently this does not actually execute in Azure since foreign keys are not primary and therefore have duplicate values, which does not work for creating edges. Working on a solution now. 
+Creates an edge between primary keys between tables.
 
 ## Usage
 
