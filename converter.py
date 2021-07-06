@@ -53,8 +53,8 @@ class Converter:
                     self.converted += "\n"
                     prev_insert = table
 
-
             i += 1
+        self.converted += "\n"
 
         return
 
@@ -186,6 +186,7 @@ class Converter:
                         query = f"({from_query}, {to_query})"
                         edge_tables[edge_table_name].append(query)
                 seen.add((from_table, to_table))
+        self.converted += "\n"
 
         return edge_tables
 
