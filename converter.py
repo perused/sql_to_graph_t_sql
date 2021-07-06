@@ -18,8 +18,8 @@ class Converter:
 
     def convert(self):
         self.convert_file()
-        edge_tables, edge_queries = self.add_edges()
-        self.insert_edges(edge_tables, edge_queries)
+        edge_tables = self.add_edges()
+        self.insert_edges(edge_tables)
         self.write_output()
     
     # converts schema into t-sql format (including replacing data types in tables and changing format of insert statements), adds tables + primary keys + foreign keys to instance dictionaries and adds AS NODE to end of tables
@@ -141,9 +141,27 @@ class Converter:
         return table_name
 
     # given a table name and their single or composite primary key/s, return the list of queries for that table 
-    def get_pk_query(self, table_name, pks):
-        # f"((SELECT $node_id FROM {from_table} WHERE {from_col} = {from_val}), (SELECT $node_id FROM {to_table} WHERE {to_col} = {to_val}))"
-        pass
+    def get_pk_queries(self, table_name, pks):
+# f"(SELECT $node_id FROM {table_name} WHERE {pk_col} = {pk_val_1})" - 1 pk
+# f"(SELECT $node_id FROM {table_name} WHERE {pk_col1} = {pk_val} AND {pk_col2} = {pk_val})" - 2 pks
+# f"(SELECT $node_id FROM {table_name} WHERE {pk_col1} = {pk_val} AND {pk_col2} = {pk_val} AND {pk_col2} = {pk_val})" - 3 pks
+        # self.table_vals = defaultdict(lambda: []) # (table_name, col_name): [vals...]
+        # so in order to be able to account for > 1 pk, we need to store table pk values when a table has more than one pk
+        
+        if len(pks) == 1:
+            return self.get_single_pk_queries(table_name, pks[0])
+        elif len(pks) == 2:
+            raise Exception("Two primary keys not implemented yet.")
+        elif len(pks) == 3:
+            raise Exception("Three primary keys not implemented yet.")
+        elif len(pks) >= 4:
+            raise Exception("Four or more primary keys not implemented yet.")
+
+    def get_single_pk_queries(self, table_name, pk_col):
+        queries = []
+        for val in self.table_vals[(table_name, pk_col)]:
+            queries.append(f"(SELECT $node_id FROM {table_name} WHERE {pk_col} = {val})")
+        return queries
 
     # create an edge between all primary keys in all tables
     # returns the tables names: queries dictionary for writing into the final document
@@ -161,8 +179,8 @@ class Converter:
                     continue
                 edge_table_name = f"{from_table}_to_{to_table}"
                 self.converted += f"CREATE TABLE {edge_table_name} AS EDGE;\n"
-                from_queries = self.get_pk_query(from_table, self.table_pks[from_table])
-                to_queries = self.get_pk_query(to_table, self.table_pks[to_table])
+                from_queries = self.get_pk_queries(from_table, self.table_pks[from_table])
+                to_queries = self.get_pk_queries(to_table, self.table_pks[to_table])
                 for from_query in from_queries:
                     for to_query in to_queries:
                         query = f"({from_query}, {to_query})"
@@ -171,42 +189,13 @@ class Converter:
 
         return edge_tables
 
-        # for from_table in tables:
-        #     for from_col, to_table, to_col in self.table_fks[from_table]:
-
-        #         edge_table_a = f"{from_table}_to_{to_table}"
-        #         edge_table_b = f"{to_table}_to_{from_table}"
-
-        #         if edge_table_a in edge_tables.keys():
-        #             edge_table_name = edge_table_a
-        #         elif edge_table_b in edge_tables.keys():
-        #             edge_table_name = edge_table_b
-        #         else:
-        #             edge_table_name = edge_table_a
-        #             edge_tables[edge_table_name] = count
-        #             edge_queries.append([])
-        #             count += 1
-
-        #         idx = edge_tables[edge_table_name]
-        #         self.converted += f"CREATE TABLE {edge_table_name} AS EDGE;\n"
-
-        #         for from_val in self.table_vals[(from_table, from_col)]:
-        #             for to_val in self.table_vals[(to_table, to_col)]:
-        #                 query = f"((SELECT $node_id FROM {from_table} WHERE {from_col} = {from_val}), (SELECT $node_id FROM {to_table} WHERE {to_col} = {to_val}))"
-        #                 edge_queries[idx].append(query)  
-        
-        # self.converted += "\n"
-        # return edge_tables, edge_queries
-
     # inserts edge queries into the edge tables
-    def insert_edges(self, edge_tables, edge_queries):
-        for edge_table_name in edge_tables:
-            idx = edge_tables[edge_table_name]
-            if len(edge_queries[idx]) == 0:
-                continue
+    # table_to_table: [queries...]
+    def insert_edges(self, edge_tables):
+        for edge_table_name in edge_tables.keys():
             self.converted += f"INSERT INTO {edge_table_name} VALUES\n"
             first = True
-            for query in edge_queries[idx]:
+            for query in edge_tables[edge_table_name]:
                 if first:
                     self.converted += "\t " + query + "\n"
                     first = False
