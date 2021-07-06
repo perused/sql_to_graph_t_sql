@@ -5,8 +5,6 @@ import argparse
 from pprint import pprint
 from collections import defaultdict
 
-# ADD_EDGES = True
-
 # converts an SQLite file to T-SQL as a graph format (tested using Microsoft Azure SQL DB)
 class Converter:
     def __init__(self, path):
@@ -142,44 +140,63 @@ class Converter:
 
         return table_name
 
-    # for every foreign key relation, create an edge table between the two tables if it doesn't exist and then create an edge between all the values from the foreign key column to the referenced key column
-    # returns a dictionary of edge table names: indexes and a list of queries where the index of the queries corresponds to the edge table name index
+    # given a table name and their single or composite primary key/s, return the list of queries for that table 
+    def get_pk_query(self, table_name, pks):
+        # f"((SELECT $node_id FROM {from_table} WHERE {from_col} = {from_val}), (SELECT $node_id FROM {to_table} WHERE {to_col} = {to_val}))"
+        pass
+
+    # create an edge between all primary keys in all tables
+    # returns the tables names: queries dictionary for writing into the final document
     def add_edges(self):
         tables = self.tables.keys()
-        edge_tables = {} # table_to_table: idx
-        edge_queries = [] # idx corresponds to edge_tables idx
-        count = 0
-
-        # issue: foreign key references primary key as an edge doesn't work since even though fk and pk are just single columns, nodes are entire rows in the table, and therefore we will just be connecting an entire row to another entire row
-        # using the below method just creates an edge between every edge in the table
-        # issue: we are currently selecting from_col and to_col, but these are not primary keys and so the values are not unique
+        edge_tables = defaultdict(lambda: []) # table_to_table: [queries...]
+        seen = set()
 
         for from_table in tables:
-            for from_col, to_table, to_col in self.table_fks[from_table]:
-
-                edge_table_a = f"{from_table}_to_{to_table}"
-                edge_table_b = f"{to_table}_to_{from_table}"
-
-                if edge_table_a in edge_tables.keys():
-                    edge_table_name = edge_table_a
-                elif edge_table_b in edge_tables.keys():
-                    edge_table_name = edge_table_b
-                else:
-                    edge_table_name = edge_table_a
-                    edge_tables[edge_table_name] = count
-                    edge_queries.append([])
-                    count += 1
-
-                idx = edge_tables[edge_table_name]
+            for to_table in tables:
+                if from_table == to_table:
+                    continue
+                # no need to do the reverse edges since they are not directed
+                if (from_table, to_table) in seen or (to_table, from_table) in seen:
+                    continue
+                edge_table_name = f"{from_table}_to_{to_table}"
                 self.converted += f"CREATE TABLE {edge_table_name} AS EDGE;\n"
+                from_queries = self.get_pk_query(from_table, self.table_pks[from_table])
+                to_queries = self.get_pk_query(to_table, self.table_pks[to_table])
+                for from_query in from_queries:
+                    for to_query in to_queries:
+                        query = f"({from_query}, {to_query})"
+                        edge_tables[edge_table_name].append(query)
+                seen.add((from_table, to_table))
 
-                for from_val in self.table_vals[(from_table, from_col)]:
-                    for to_val in self.table_vals[(to_table, to_col)]:
-                        query = f"((SELECT $node_id FROM {from_table} WHERE {from_col} = {from_val}), (SELECT $node_id FROM {to_table} WHERE {to_col} = {to_val}))"
-                        edge_queries[idx].append(query)  
+        return edge_tables
+
+        # for from_table in tables:
+        #     for from_col, to_table, to_col in self.table_fks[from_table]:
+
+        #         edge_table_a = f"{from_table}_to_{to_table}"
+        #         edge_table_b = f"{to_table}_to_{from_table}"
+
+        #         if edge_table_a in edge_tables.keys():
+        #             edge_table_name = edge_table_a
+        #         elif edge_table_b in edge_tables.keys():
+        #             edge_table_name = edge_table_b
+        #         else:
+        #             edge_table_name = edge_table_a
+        #             edge_tables[edge_table_name] = count
+        #             edge_queries.append([])
+        #             count += 1
+
+        #         idx = edge_tables[edge_table_name]
+        #         self.converted += f"CREATE TABLE {edge_table_name} AS EDGE;\n"
+
+        #         for from_val in self.table_vals[(from_table, from_col)]:
+        #             for to_val in self.table_vals[(to_table, to_col)]:
+        #                 query = f"((SELECT $node_id FROM {from_table} WHERE {from_col} = {from_val}), (SELECT $node_id FROM {to_table} WHERE {to_col} = {to_val}))"
+        #                 edge_queries[idx].append(query)  
         
-        self.converted += "\n"
-        return edge_tables, edge_queries
+        # self.converted += "\n"
+        # return edge_tables, edge_queries
 
     # inserts edge queries into the edge tables
     def insert_edges(self, edge_tables, edge_queries):
