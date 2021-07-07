@@ -4,6 +4,7 @@ import sys
 import argparse
 from pprint import pprint
 from collections import defaultdict
+import re
 
 # converts an SQLite file to T-SQL as a graph format (tested using Microsoft Azure SQL DB)
 class Converter:
@@ -134,7 +135,6 @@ class Converter:
         vals_bracket = line.index("(", lower_line.index("values")) + 1
         vals = line[vals_bracket:-2]
         
-        # TODO
         vals, split_vals = self.clean_vals(len(self.tables[table_name]), vals)
         
         new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n"""
@@ -149,13 +149,25 @@ class Converter:
     # removes the varying types of apostrophes from the values string - made extra necessary since different schemas have different types of apostrophes
     # returns the vals string and split version of the vals
     def clean_vals(self, num_columns, vals):
-        # check the number of columns matches the number of split values (in case a value has a commas in it)
 
-        # need to get rid of possessive apostrophes e.g 'Valentine's day'
-        vals = vals.replace("'s", "s")
         vals = vals.replace('"', "'")
         split_vals = vals.split(",")
         split_vals = [val.strip() for val in split_vals]
+
+        # check the number of columns matches the number of split values (in case a value has a commas in it)
+        assert len(split_vals) == num_columns, f"Length of split vals is {len(split_vals)} and number of columns is {num_columns}, meaning that there is an unexpected comma value in the values, which are: {vals}."
+
+        # TODO: check there are no other ' apostrophes lying around e.g l'oreal
+        for i in range(len(split_vals)):
+            val = split_vals[i]
+            res = re.search(r"(.'s)", val)
+            # need to get rid of possessive apostrophes e.g 'Valentine's day' but need to make sure it doesn't get rid of e.g 'superman', so need to use a regex
+            if res:
+                match = res.groups(0)[0]
+                new_val = val.replace(match, match[0])
+                split_vals[i] = new_val
+
+        vals = ", ".join(split_vals)
 
         return vals, split_vals
 
