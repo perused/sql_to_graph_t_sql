@@ -121,8 +121,6 @@ class Converter:
             line = contents[i].strip()
 
         self.converted += ") AS NODE;" + "\n\n"
-        for pair in self.table_vals.keys():
-            print(pair)
 
         return i
 
@@ -135,20 +133,31 @@ class Converter:
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
         vals_bracket = line.index("(", lower_line.index("values")) + 1
         vals = line[vals_bracket:-2]
-        vals = vals.replace("'", "")
-        vals = vals.replace("`", "'")
-        vals = vals.replace('"', "'")
+        
+        # TODO
+        vals, split_vals = self.clean_vals(len(self.tables[table_name]), vals)
+        
         new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n"""
         self.converted += new_line
-
+        
         # storing of values for later usage
-        # technically for foreign <-> primary key edges we only need to store foreign and primary key values, but for extensibility sake we will store all
-        # TODO: check that no entries have commas in them - will get an error when zipping them together later probably
-        vals_list = vals.replace("'", "").split(",")
-        for col, val in zip(self.tables[table_name], vals_list):
+        for col, val in zip(self.tables[table_name], split_vals):
             self.table_vals[(table_name, col)].append(val)
 
         return table_name
+
+    # removes the varying types of apostrophes from the values string - made extra necessary since different schemas have different types of apostrophes
+    # returns the vals string and split version of the vals
+    def clean_vals(self, num_columns, vals):
+        # check the number of columns matches the number of split values (in case a value has a commas in it)
+
+        # need to get rid of possessive apostrophes e.g 'Valentine's day'
+        vals = vals.replace("'s", "s")
+        vals = vals.replace('"', "'")
+        split_vals = vals.split(",")
+        split_vals = [val.strip() for val in split_vals]
+
+        return vals, split_vals
 
     # given a table name and their single or composite primary key/s, return the list of queries for that table 
     def get_pk_queries(self, table_name, pks):
@@ -165,11 +174,8 @@ class Converter:
 
     def get_single_pk_queries(self, table_name, pk_col):
         queries = []
-        print(f"table name = {table_name}, pk col = {pk_col}")
-        print(f"pk vals = {self.table_vals[(table_name, pk_col)]}")
         for val in self.table_vals[(table_name, pk_col)]:
             queries.append(f"(SELECT $node_id FROM {table_name} WHERE {pk_col} = {val})")
-        print(f"queries = {queries}")
         return queries
 
     def get_double_pk_queries(self, table_name, pks):
