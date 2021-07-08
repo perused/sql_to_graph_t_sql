@@ -125,6 +125,16 @@ class Converter:
     # takes in a field of a table and returns the converted field
     def field_replacements(self, line):
         line = line.lower()
+
+        # 1. CORRECTING MISTAKES IN SPIDER SCHEMAS
+        # TODO: If fixing any of these mistakes causes an issue in a completely seperate schema, then hardcode the directory name into the fix
+        # driving_school/schema.sql - allocated varchar is not big enough
+        line = line.replace("varchar(10)", "varchar(20)")
+        # concert_singer/schema.sql - foreign key different type to ref key
+        line = line.replace('"stadium_id" text', "stadium_id int")
+        line = line.replace('"singer_id" text', "singer_id int")
+
+        # 2. GENERAL CONVERSIONS
         # TODO: check if any inserts in spider are larger than 100 characters
         # TODO: check if any spider fields have 'text' in them
         line = line.replace("text", "VARCHAR(100)")
@@ -136,8 +146,12 @@ class Converter:
         line = line.replace("not null", "")
         line = line.replace("null", "")
         line = line.replace("double", "FLOAT")
-        # the below is for a mistake with driving_schema.sql where the allocated varchar is not big enough
-        line = line.replace("varchar(10)", "varchar(20)")
+        
+        # no bool type in microsoft sql
+        line = line.replace("bool", "varchar(1)")
+
+        
+
         return line
 
     # convert sqlite insert statement to valid T-SQL insert statement
@@ -324,7 +338,7 @@ class Converter:
         new_path += "_converted.sql"
         with open(new_path, "w") as fp:
             fp.write(self.converted)
-        print(f"Successfully converted '{self.path}' to '{new_path}'")
+        print(f"'{self.path}' ==> '{new_path}'")
 
 # process command line arguments
 # returns: args - namespace of command line arguments
@@ -360,9 +374,6 @@ def main():
                         continue
                     if test:
                         Converter(path)
-                # print(os.path.join(root, name))
-            # for name in dirs:
-            #     print(os.path.join(root, name))
 
 if __name__ == "__main__":
     main()
