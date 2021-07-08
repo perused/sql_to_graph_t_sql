@@ -40,7 +40,7 @@ class Converter:
             # table
             if split_line[0].upper() == "CREATE":
                 # TODO: check if there are any two word table names in the DB
-                table_name = split_line[2]
+                table_name = split_line[2].lower()
                 table_name = table_name.replace('"', '')
                 table_name = table_name.replace('`', '')
                 i = self.convert_table(contents, i, table_name)
@@ -130,7 +130,7 @@ class Converter:
     def convert_insert(self, line):
         lower_line = line.lower()
         split_line = line.split()
-        table_name = split_line[2].replace('"', '')
+        table_name = split_line[2].replace('"', '').replace('`', '').replace("'", "").lower()
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
         vals_bracket = line.index("(", lower_line.index("values")) + 1
         vals = line[vals_bracket:-2]
@@ -150,27 +150,75 @@ class Converter:
     # returns the vals string and split version of the vals
     def clean_vals(self, num_columns, vals):
 
-        vals = vals.replace('"', "'")
-        vals = vals.replace('`', "'")
+        # INSERT INTO person VALUES (3, "Smith, John", 40);
+        # INSERT INTO person VALUES ("3", "Smith, John", 40);
+        # INSERT INTO person VALUES (3, "Smith, John", "40");
+        # INSERT INTO person VALUES ("3", "Smith, John", "40");
 
-        # need to split the values by something other than commas
+        # to discern whether a value is comma separated or not, the easiest way would be to check whether it is within apostrophes or not 
+        print(vals)
+
+
+        inside_text_val = False
+        inside_num_val = False
+        apos_type = ""
+        text_val = ""
+        split_vals = []
+        i = 0
+        while i < len(vals):
+
+            cur = vals[i]
+
+            # if we have seen a text open apostrophe already
+            if inside_text_val:
+                # if we are seeing another apostrophe
+                if cur == "'" or cur == '"' or cur == "`":
+                    # it is either a possessive e.g Valentine's
+                    if i != len(vals) - 1 and vals[i+1] != ",":
+                        pass
+
+                    # or we are marking the end of the text value
+                    else:
+                        split_vals.append(text_val)
+                        text_val = ""
+                        inside_text_val = False
+                
+                # otherwise we just append it to the text val and continue
+                else:
+                    text_val += cur
+
+            # if we have seen a numerical value already
+            elif inside_num_val:
+                pass
+
+            # otherwise we are about to enter a text val, a numerical val or we are between vals (commas)
+            else:
+                pass
+
+            i += 1
+
+
+        # vals = vals.replace('"', "'")
+        # vals = vals.replace('`', "'")
+
+        # # need to split the values by something other than commas
         split_vals = vals.split(",")
-        split_vals = [val.strip() for val in split_vals]
+        # split_vals = [val.strip() for val in split_vals]
 
-        # check the number of columns matches the number of split values (in case a value has a commas in it)
-        assert len(split_vals) == num_columns, f"Length of split vals is {len(split_vals)} and number of columns is {num_columns}, meaning that there is an unexpected comma value in the values, which are: {vals}."
+        # # check the number of columns matches the number of split values (in case a value has a commas in it)
+        # assert len(split_vals) == num_columns, f"Length of split vals is {len(split_vals)} and number of columns is {num_columns}, meaning that there is an unexpected comma value in the values, which are: {vals}."
 
-        # TODO: check there are no other ' apostrophes lying around e.g l'oreal
-        for i in range(len(split_vals)):
-            val = split_vals[i]
-            res = re.search(r"(.'s)", val)
-            # need to get rid of possessive apostrophes e.g 'Valentine's day' but need to make sure it doesn't get rid of e.g 'superman', so need to use a regex
-            if res:
-                match = res.groups(0)[0]
-                new_val = val.replace(match, match[0])
-                split_vals[i] = new_val
+        # # TODO: check there are no other ' apostrophes lying around e.g l'oreal
+        # for i in range(len(split_vals)):
+        #     val = split_vals[i]
+        #     res = re.search(r"(.'s)", val)
+        #     # need to get rid of possessive apostrophes e.g 'Valentine's day' but need to make sure it doesn't get rid of e.g 'superman', so need to use a regex
+        #     if res:
+        #         match = res.groups(0)[0]
+        #         new_val = val.replace(match, match[0])
+        #         split_vals[i] = new_val
 
-        vals = ", ".join(split_vals)
+        # vals = ", ".join(split_vals)
 
         return vals, split_vals
 
