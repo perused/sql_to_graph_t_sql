@@ -26,5 +26,4 @@ e.g python converter.py 1 schemas
 - SQL only tested in Microsoft Azure SQL DB environment only.
 - .sql schemas have only been obtained from the Spider dataset (https://yale-lily.github.io/spider), other datasets may not be compatible and will require tweaks. 
 - Still in development stage so issues with Spider dataset are undergoing fixes too. 
-- Directory conversion is only for files that begin with 'PRAGMA FOREIGN KEYS = ON' which is temporary until a better solution is implemented.
 - For constraints such as NOT NULL and NULL, these have been removed for now as the Microsoft SQL Server equivalent is: "ALTER TABLE ALTER COLUMN NOT NULL" and this has not been deemed necessary in the converted sql yet
