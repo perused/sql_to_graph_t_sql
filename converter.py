@@ -126,7 +126,6 @@ class Converter:
         return i
 
     # convert sqlite insert statement to valid T-SQL insert statement
-    # self.table_vals = defaultdict(lambda: []) # (table_name, col_name): [vals...]
     def convert_insert(self, line):
         lower_line = line.lower()
         split_line = line.split()
@@ -137,7 +136,17 @@ class Converter:
         
         split_vals = self.clean_vals(len(self.tables[table_name]), vals)
         
-        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({", ".join([str(val) for val in split_vals])});\n"""
+        vals_text = ""
+        for val in split_vals:
+            if type(val) == int:
+                vals_text += str(val)
+            else:
+                vals_text += f"'{val}'"
+            if val != split_vals[-1]:
+                vals_text += ", "
+
+        new_line = f"INSERT INTO {table_name} {columns} VALUES ({vals_text});\n"
+
         self.converted += new_line
         
         # storing of values for later usage
