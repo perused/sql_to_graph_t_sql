@@ -151,6 +151,9 @@ class Converter:
     def clean_vals(self, num_columns, vals):
 
         vals = vals.replace('"', "'")
+        vals = vals.replace('`', "'")
+
+        # need to split the values by something other than commas
         split_vals = vals.split(",")
         split_vals = [val.strip() for val in split_vals]
 
