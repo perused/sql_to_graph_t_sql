@@ -135,9 +135,9 @@ class Converter:
         vals_bracket = line.index("(", lower_line.index("values")) + 1
         vals = line[vals_bracket:-2]
         
-        vals, split_vals = self.clean_vals(len(self.tables[table_name]), vals)
+        split_vals = self.clean_vals(len(self.tables[table_name]), vals)
         
-        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({vals});\n"""
+        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({", ".join([val for val in split_vals])});\n"""
         self.converted += new_line
         
         # storing of values for later usage
@@ -146,17 +146,11 @@ class Converter:
 
         return table_name
 
-    # removes the varying types of apostrophes from the values string - made extra necessary since different schemas have different types of apostrophes
-    # returns the vals string and split version of the vals
+    # scans through the values string and extracts individual values
+    # takes into account apostrophes e.g 'Valentine's' and 'L'oreal' 
+    # takes into account extra commas e.g 'Smith, John' 
+    # returns a list of each individual value
     def clean_vals(self, num_columns, vals):
-
-        # INSERT INTO person VALUES (3, "Smith, John", 40);
-        # INSERT INTO person VALUES ("3", "Smith, John", 40);
-        # INSERT INTO person VALUES (3, "Smith, John", "40");
-        # INSERT INTO person VALUES ("3", "Smith, John", "40");
-
-        # to discern whether a value is comma separated or not, the easiest way would be to check whether it is within apostrophes or not 
-        print(vals)
 
         numerical = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "-"]
         inside_text_val = False
@@ -165,6 +159,7 @@ class Converter:
         num_val = ""
         split_vals = []
         i = 0
+
         while i < len(vals):
 
             cur = vals[i]
@@ -173,7 +168,7 @@ class Converter:
             if inside_text_val:
                 # if we are seeing another apostrophe
                 if cur == "'" or cur == '"' or cur == "`":
-                    # it is either a possessive e.g 'Valentine's' in which case skip
+                    # it is either a possessive/other e.g 'Valentine's' or 'L'oreal' in which case skip
                     if i != len(vals) - 1 and vals[i+1] != ",":
                         pass
 
@@ -182,8 +177,6 @@ class Converter:
                         split_vals.append(text_val)
                         text_val = ""
                         inside_text_val = False
-                        # now jump to the next value
-                        i = self.next_i(vals, i)
                 
                 # otherwise we just append it to the text val and continue
                 else:
@@ -196,8 +189,6 @@ class Converter:
                     split_vals.append(int(num_val))
                     num_val = ""
                     inside_num_val = False
-                    # now jump to the next value
-                    i = self.next_i(vals, i)
                 
                 # otherwise we add it to ongoing numerical val
                 elif cur in numerical:
@@ -206,40 +197,24 @@ class Converter:
                 else:
                     raise Exception(f"When parsing values, expected to be inside a numerical value, which so far is '{num_val}', but encountered the character '{cur}' which is not considered a numerical value. The full values line is: {vals}")
 
-            # otherwise we are about to encounter a new value. Due to the usage of self.next_i, we should never be between values, but always at the start of them.
+            # otherwise we are a) encountering a new text value b) encountering a new numerical value c) in between values
             else:
-                pass
+                # a)
+                if cur == "'" or cur == '"' or cur == "`": 
+                    inside_text_val = True
+                # b)
+                elif cur in numerical:
+                    inside_num_val = True
+                # c)
+                else:
+                    pass
 
             i += 1
 
+        if len(num_columns) != len(split_vals):
+            raise Exception(f"Length of split vals is {len(split_vals)} and number of columns is {num_columns}, meaning that there is an unexpected comma value in the values, which are: {vals}.")
 
-        # vals = vals.replace('"', "'")
-        # vals = vals.replace('`', "'")
-
-        # # need to split the values by something other than commas
-        split_vals = vals.split(",")
-        # split_vals = [val.strip() for val in split_vals]
-
-        # # check the number of columns matches the number of split values (in case a value has a commas in it)
-        # assert len(split_vals) == num_columns, f"Length of split vals is {len(split_vals)} and number of columns is {num_columns}, meaning that there is an unexpected comma value in the values, which are: {vals}."
-
-        # # TODO: check there are no other ' apostrophes lying around e.g l'oreal
-        # for i in range(len(split_vals)):
-        #     val = split_vals[i]
-        #     res = re.search(r"(.'s)", val)
-        #     # need to get rid of possessive apostrophes e.g 'Valentine's day' but need to make sure it doesn't get rid of e.g 'superman', so need to use a regex
-        #     if res:
-        #         match = res.groups(0)[0]
-        #         new_val = val.replace(match, match[0])
-        #         split_vals[i] = new_val
-
-        # vals = ", ".join(split_vals)
-
-        return vals, split_vals
-
-
-    def next_i(self, vals, i):
-        pass
+        return split_vals
 
     # given a table name and their single or composite primary key/s, return the list of queries for that table 
     def get_pk_queries(self, table_name, pks):
