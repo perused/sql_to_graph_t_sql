@@ -11,12 +11,15 @@ class Converter:
     def __init__(self, path):
         self.path = path
         self.converted = ""
-        self.tables = defaultdict(lambda: []) # tables and their fields
-        self.table_pks = defaultdict(lambda: []) # tables and their primary keys
-        self.table_fks = defaultdict(lambda: []) # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
-        self.table_vals = defaultdict(lambda: []) # (table_name, col_name): [vals...]
+        self.tables = defaultdict(lambda: []) 
+        self.table_pks = defaultdict(lambda: []) 
+        # tables and their foreign keys stored as table: (for_key, ref_table, ref_key)
+        self.table_fks = defaultdict(lambda: []) 
+        # Values of tables stored as: (table_name, col_name): [vals...]
+        self.table_vals = defaultdict(lambda: []) 
         self.convert()
 
+    # calls all relevant functions to convert the input file
     def convert(self):
         self.convert_file()
         edge_tables = self.add_edges()
@@ -71,13 +74,7 @@ class Converter:
         line = contents[i].strip()
         id = 1
         while line != ");":
-            # TODO: check if any inserts in spider are larger than 100 characters
-            # TODO: check if any spider fields have 'text' in them
-            line = line.replace("text", "VARCHAR(100)")
-            line = line.replace('`', '')
-            line = line.replace('"', '')
-            # TODO: check if any inserts in spider have 'real' in them
-            line = line.replace("real", "FLOAT")
+            line = self.field_replacements(line)
             self.converted += "\t" + line + "\n"
             split_line = line.lower().split()
             lower_line = line.lower()
@@ -125,6 +122,22 @@ class Converter:
 
         return i
 
+    # takes in a field of a table and returns the converted field
+    def field_replacements(self, line):
+        line = line.lower()
+        # TODO: check if any inserts in spider are larger than 100 characters
+        # TODO: check if any spider fields have 'text' in them
+        line = line.replace("text", "VARCHAR(100)")
+        line = line.replace('`', '')
+        line = line.replace('"', '')
+        # TODO: check if any inserts in spider have 'real' in them
+        line = line.replace("real", "FLOAT")
+        # TODO: Currently just removing constraints but can insert them with alter table statements
+        line = line.replace("not null", "")
+        line = line.replace("null", "")
+        line = line.replace("double", "FLOAT")
+        return line
+
     # convert sqlite insert statement to valid T-SQL insert statement
     def convert_insert(self, line):
         lower_line = line.lower()
@@ -137,12 +150,13 @@ class Converter:
         split_vals = self.clean_vals(len(self.tables[table_name]), vals)
         
         vals_text = ""
-        for val in split_vals:
+        for i in range(len(split_vals)):
+            val = split_vals[i]
             if type(val) == int:
                 vals_text += str(val)
             else:
                 vals_text += f"'{val}'"
-            if val != split_vals[-1]:
+            if i != len(split_vals) - 1:
                 vals_text += ", "
 
         new_line = f"INSERT INTO {table_name} {columns} VALUES ({vals_text});\n"
@@ -337,7 +351,6 @@ def main():
                     except:
                         continue
                     if test:
-                        print(f"Attempting to convert '{path}'")
                         Converter(path)
                 # print(os.path.join(root, name))
             # for name in dirs:

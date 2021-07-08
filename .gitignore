@@ -1,3 +1,2 @@
-delete_all_tables.sql
 schemas/*_converted.sql
 schemas/nested\ folder/*_converted.sql
