@@ -8,8 +8,9 @@ import re
 
 # converts an SQLite file to T-SQL as a graph format (tested using Microsoft Azure SQL DB)
 class Converter:
-    def __init__(self, path):
+    def __init__(self, path, filename):
         self.path = path
+        self.filename = filename
         self.converted = ""
         self.tables = defaultdict(lambda: []) 
         self.table_pks = defaultdict(lambda: []) 
@@ -332,10 +333,10 @@ class Converter:
                     self.converted += "\t," + query + "\n"
             self.converted += ";\n\n"
 
-    # write the final output to path_converted.txt
+    # write the final output to converted_<path>
     def write_output(self):
-        new_path = self.path.replace(".sql", "")
-        new_path += "_converted.sql"
+        new_path = self.path.replace(self.filename, "")
+        new_path = new_path + "converted_" + self.filename
         with open(new_path, "w") as fp:
             fp.write(self.converted)
         print(f"'{self.path}' ==> '{new_path}'")
@@ -361,19 +362,13 @@ def process_args():
 def main():
     args = process_args()
     if args.file_flag == 0:
-        Converter(args.path)
+        Converter(args.path, args.path)
     else:
         for root, dirs, files in os.walk(args.path):
             for name in files:
-                path = os.path.join(root, name)
-                with open(path, "r") as fp:
-                    try:
-                        line_one = fp.readline().strip().split()
-                        test = line_one[0].lower() == "pragma"
-                    except:
-                        continue
-                    if test:
-                        Converter(path)
+                if "converted" not in name and ".sql" in name: 
+                    path = os.path.join(root, name)
+                    Converter(path, name)
 
 if __name__ == "__main__":
     main()
