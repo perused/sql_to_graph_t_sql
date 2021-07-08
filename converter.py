@@ -137,7 +137,7 @@ class Converter:
         
         split_vals = self.clean_vals(len(self.tables[table_name]), vals)
         
-        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({", ".join([val for val in split_vals])});\n"""
+        new_line = f"""INSERT INTO {table_name} {columns} VALUES ({", ".join([str(val) for val in split_vals])});\n"""
         self.converted += new_line
         
         # storing of values for later usage
@@ -204,6 +204,7 @@ class Converter:
                     inside_text_val = True
                 # b)
                 elif cur in numerical:
+                    num_val += cur
                     inside_num_val = True
                 # c)
                 else:
@@ -211,7 +212,11 @@ class Converter:
 
             i += 1
 
-        if len(num_columns) != len(split_vals):
+        # if we finished the loop at a numerical value, it wont have been appended yet
+        if inside_num_val:
+            split_vals.append(int(num_val))
+
+        if num_columns != len(split_vals):
             raise Exception(f"Length of split vals is {len(split_vals)} and number of columns is {num_columns}, meaning that there is an unexpected comma value in the values, which are: {vals}.")
 
         return split_vals
