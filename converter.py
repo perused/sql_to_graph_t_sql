@@ -158,11 +158,11 @@ class Converter:
         # to discern whether a value is comma separated or not, the easiest way would be to check whether it is within apostrophes or not 
         print(vals)
 
-
+        numerical = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "-"]
         inside_text_val = False
         inside_num_val = False
-        apos_type = ""
         text_val = ""
+        num_val = ""
         split_vals = []
         i = 0
         while i < len(vals):
@@ -173,7 +173,7 @@ class Converter:
             if inside_text_val:
                 # if we are seeing another apostrophe
                 if cur == "'" or cur == '"' or cur == "`":
-                    # it is either a possessive e.g Valentine's
+                    # it is either a possessive e.g 'Valentine's' in which case skip
                     if i != len(vals) - 1 and vals[i+1] != ",":
                         pass
 
@@ -182,6 +182,8 @@ class Converter:
                         split_vals.append(text_val)
                         text_val = ""
                         inside_text_val = False
+                        # now jump to the next value
+                        i = self.next_i(vals, i)
                 
                 # otherwise we just append it to the text val and continue
                 else:
@@ -189,9 +191,22 @@ class Converter:
 
             # if we have seen a numerical value already
             elif inside_num_val:
-                pass
+                # if we are seeing a comma it is finished
+                if cur == ",":
+                    split_vals.append(int(num_val))
+                    num_val = ""
+                    inside_num_val = False
+                    # now jump to the next value
+                    i = self.next_i(vals, i)
+                
+                # otherwise we add it to ongoing numerical val
+                elif cur in numerical:
+                    num_val += cur
 
-            # otherwise we are about to enter a text val, a numerical val or we are between vals (commas)
+                else:
+                    raise Exception(f"When parsing values, expected to be inside a numerical value, which so far is '{num_val}', but encountered the character '{cur}' which is not considered a numerical value. The full values line is: {vals}")
+
+            # otherwise we are about to encounter a new value. Due to the usage of self.next_i, we should never be between values, but always at the start of them.
             else:
                 pass
 
@@ -221,6 +236,10 @@ class Converter:
         # vals = ", ".join(split_vals)
 
         return vals, split_vals
+
+
+    def next_i(self, vals, i):
+        pass
 
     # given a table name and their single or composite primary key/s, return the list of queries for that table 
     def get_pk_queries(self, table_name, pks):
