@@ -136,6 +136,8 @@ class Converter:
         line = line.replace("not null", "")
         line = line.replace("null", "")
         line = line.replace("double", "FLOAT")
+        # the below is for a mistake with driving_schema.sql where the allocated varchar is not big enough
+        line = line.replace("varchar(10)", "varchar(20)")
         return line
 
     # convert sqlite insert statement to valid T-SQL insert statement
@@ -260,12 +262,18 @@ class Converter:
     def get_single_pk_queries(self, table_name, pk_col):
         queries = []
         for val in self.table_vals[(table_name, pk_col)]:
+            if type(val) != int:
+                val = f"'{val}'"
             queries.append(f"(SELECT $node_id FROM {table_name} WHERE {pk_col} = {val})")
         return queries
 
     def get_double_pk_queries(self, table_name, pks):
         queries = []
         for val_a, val_b in zip(self.table_vals[(table_name, pks[0])], self.table_vals[(table_name, pks[1])]):
+            if type(val_a) != int:
+                val_a = f"'{val_a}'"
+            if type(val_b) != int:
+                val_b = f"'{val_b}'"
             queries.append(f"(SELECT $node_id FROM {table_name} WHERE {pks[0]} = {val_a} AND {pks[1]} = {val_b})")
         return queries
 
