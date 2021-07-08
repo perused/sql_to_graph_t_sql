@@ -224,9 +224,12 @@ class Converter:
 
             # if we have seen a numerical value already
             elif inside_num_val:
-                # if we are seeing a comma it is finished
-                if cur == ",":
-                    split_vals.append(int(num_val))
+                # if we are seeing a comma or space it is finished
+                if cur == "," or cur == " ":
+                    if "." in num_val:
+                        split_vals.append(float(num_val))
+                    else:
+                        split_vals.append(int(num_val))
                     num_val = ""
                     inside_num_val = False
                 
@@ -254,7 +257,10 @@ class Converter:
 
         # if we finished the loop at a numerical value, it wont have been appended yet
         if inside_num_val:
-            split_vals.append(int(num_val))
+            if "." in num_val:
+                split_vals.append(float(num_val))
+            else:
+                split_vals.append(int(num_val))
 
         if num_columns != len(split_vals):
             raise Exception(f"Length of split vals is {len(split_vals)} and number of columns is {num_columns}, meaning that there is an unexpected comma value in the values, which are: {vals}.")
@@ -298,9 +304,16 @@ class Converter:
         tables = self.tables.keys()
         edge_tables = defaultdict(lambda: []) # table_to_table: [queries...]
         seen = set()
+        skipped = set()
 
         for from_table in tables:
+            if len(self.table_pks[from_table]) == 0:
+                skipped.add(from_table)
+                continue
             for to_table in tables:
+                if len(self.table_pks[to_table]) == 0:
+                    skipped.add(to_table)
+                    continue
                 if from_table == to_table:
                     continue
                 # no need to do the reverse edges since they are not directed
@@ -316,6 +329,12 @@ class Converter:
                         edge_tables[edge_table_name].append(query)
                 seen.add((from_table, to_table))
         self.converted += "\n"
+
+        if len(skipped) > 0:
+            plural = ""
+            if len(skipped) > 1:
+                plural = "s"
+            print(f"Note: skipped table{plural} {skipped} in inserting edges since no primary keys were detected.")
 
         return edge_tables
 
@@ -339,7 +358,7 @@ class Converter:
         new_path = new_path + "converted_" + self.filename
         with open(new_path, "w") as fp:
             fp.write(self.converted)
-        print(f"'{self.path}' ==> '{new_path}'")
+        print(f"==> '{new_path}'\n")
 
 # process command line arguments
 # returns: args - namespace of command line arguments
@@ -364,11 +383,14 @@ def main():
     if args.file_flag == 0:
         Converter(args.path, args.path)
     else:
+        i = 1
         for root, dirs, files in os.walk(args.path):
             for name in files:
                 if "converted" not in name and ".sql" in name: 
+                    print(f"{i}. {name}")
                     path = os.path.join(root, name)
                     Converter(path, name)
+                    i += 1
 
 if __name__ == "__main__":
     main()
