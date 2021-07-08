@@ -18,6 +18,7 @@ class Converter:
         self.table_fks = defaultdict(lambda: []) 
         # Values of tables stored as: (table_name, col_name): [vals...]
         self.table_vals = defaultdict(lambda: []) 
+        self.skipped_tables = set()
         self.convert()
 
     # calls all relevant functions to convert the input file
@@ -70,6 +71,9 @@ class Converter:
     # add AS NODE to end of table
     # add to self.converted
     def convert_table(self, contents, i, table_name):
+        # SPIDER ISSUES - table Has_pet references Pets before Pets has been defined
+        if table_name == "has_pet":
+            return self.skip_table(i, contents, table_name)
         self.converted += "\n" + contents[i].replace("`", '')
         i += 1
         line = contents[i].strip()
@@ -123,6 +127,15 @@ class Converter:
 
         return i
 
+    # skips over a table rather than converting it
+    def skip_table(self, i, contents, table_name):
+        line = contents[i]
+        while line != ");":
+            line = contents[i].strip()
+            i += 1
+        self.skipped_tables.add(table_name)
+        return i
+
     # takes in a field of a table and returns the converted field
     def field_replacements(self, line):
         line = line.lower()
@@ -151,8 +164,6 @@ class Converter:
         # no bool type in microsoft sql
         line = line.replace("bool", "varchar(1)")
 
-        
-
         return line
 
     # convert sqlite insert statement to valid T-SQL insert statement
@@ -160,6 +171,8 @@ class Converter:
         lower_line = line.lower()
         split_line = line.split()
         table_name = split_line[2].replace('"', '').replace('`', '').replace("'", "").lower()
+        if table_name in self.skipped_tables:
+            return
         columns = "(" + ", ".join([col for col in self.tables[table_name]]) + ")"
         vals_bracket = line.index("(", lower_line.index("values")) + 1
         vals = line[vals_bracket:-2]
@@ -387,8 +400,8 @@ def main():
         for root, dirs, files in os.walk(args.path):
             for name in files:
                 if "converted" not in name and ".sql" in name: 
-                    print(f"{i}. {name}")
                     path = os.path.join(root, name)
+                    print(f"{i}. {path}")
                     Converter(path, name)
                     i += 1
 

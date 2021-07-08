@@ -11,14 +11,6 @@ create table Student (
 ) AS NODE;
 
 
-create table Has_Pet (
-	stuid		integer,
-	petid		integer,
-	foreign key(petid) references pets(petid),
-	foreign key(stuid) references student(stuid)
-) AS NODE;
-
-
 create table Pets (
 	petid		integer primary key,
 	pettype		varchar(20),
@@ -60,12 +52,8 @@ INSERT INTO student (stuid, lname, fname, age, sex, major, advisor, city_code) V
 INSERT INTO student (stuid, lname, fname, age, sex, major, advisor, city_code) VALUES (1033, 'Simms', 'William', 18, 'M', 550, 8772, 'NAR');
 INSERT INTO student (stuid, lname, fname, age, sex, major, advisor, city_code) VALUES (1034, 'Epp', 'Eric', 18, 'M', 50, 5718, 'BOS');
 INSERT INTO student (stuid, lname, fname, age, sex, major, advisor, city_code) VALUES (1035, 'Schmidt', 'Sarah', 26, 'F', 50, 5718, 'WAS');
-INSERT INTO has_pet (stuid, petid) VALUES (1001, 2001);
 
-INSERT INTO has_pet (stuid, petid) VALUES (1002, 2002);
-INSERT INTO has_pet (stuid, petid) VALUES (1002, 2003);
 INSERT INTO pets (petid, pettype, pet_age, weight) VALUES (2001, 'cat', 3, 12);
-
 INSERT INTO pets (petid, pettype, pet_age, weight) VALUES (2002, 'dog', 2, '13.4');
 INSERT INTO pets (petid, pettype, pet_age, weight) VALUES (2003, 'dog', 1, '9.3');
 

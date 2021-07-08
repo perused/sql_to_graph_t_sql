@@ -1,0 +1,8 @@
+ISSUES WITH THE SPIDER DATASET
+
+# driving_school/schema.sql - allocated varchar is not big enough
+line = line.replace("varchar(10)", "varchar(20)")
+# concert_singer/schema.sql - foreign key different type to ref key
+line = line.replace('"stadium_id" text', "stadium_id int")
+line = line.replace('"singer_id" text', "singer_id int")
+# pets_1/schema.sql - table Has_pet references Pets before Pets has been defined
