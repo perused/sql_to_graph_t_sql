@@ -399,7 +399,7 @@ def main():
         i = 1
         for root, dirs, files in os.walk(args.path):
             for name in files:
-                if "converted" not in name and ".sql" in name: 
+                if "converted" not in name and re.search(r".sql$", name): 
                     path = os.path.join(root, name)
                     print(f"{i}. {path}")
                     Converter(path, name)

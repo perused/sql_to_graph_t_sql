@@ -28,3 +28,4 @@ e.g python converter.py 1 schemas
 - Still in development stage so issues with Spider dataset are undergoing fixes too. 
 - For constraints such as NOT NULL and NULL, these have been removed for now as the Microsoft SQL Server equivalent is: "ALTER TABLE ALTER COLUMN NOT NULL" and this has not been deemed necessary in the converted sql yet
 - Tables without primary keys, such as Has_pet in schemas/pets_1/schema.sql, are excluded from edge creations since they represent the same thing the edges are attempting to represent
+- Some schemas have the INSERTs to tables in nested directories containing .csv files e.g schemas/flight_2/. This behaviour has not been accounted for yet.
